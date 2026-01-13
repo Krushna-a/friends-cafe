@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyWebhookSignature } = require("../utils/meta-whatsapp");
+const { verifyWebhookSignature } = require("../utils/whatsapp");
 
 const router = express.Router();
 
