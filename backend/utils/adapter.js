@@ -81,31 +81,7 @@ async function createOrder({ userId, items, paid, tableNumber }) {
     const o = await Order.create(order);
     const orderObj = o.toObject();
 
-    // Send WhatsApp confirmation if order is already paid
-    if (paid) {
-      try {
-        const user = await getUserById(userId);
-        if (user && user.mobile) {
-          const { sendOrderConfirmation } = require("./whatsapp");
-
-          // Generate invoice URL using MongoDB ObjectId
-          const invoiceUrl = `${
-            process.env.FRONTEND_URL || "http://localhost:3000"
-          }/invoice/${orderObj._id}`;
-
-          await sendOrderConfirmation(user, orderObj, invoiceUrl);
-          console.log(
-            `WhatsApp confirmation sent to ${user.mobile} for new paid order ${orderObj._id}`
-          );
-        }
-      } catch (whatsappError) {
-        console.error(
-          "Failed to send WhatsApp confirmation for new order:",
-          whatsappError
-        );
-      }
-    }
-
+    console.log(`✅ Order created successfully with ID: ${orderObj._id}`);
     return orderObj;
   }
 
@@ -123,31 +99,7 @@ async function createOrder({ userId, items, paid, tableNumber }) {
   db.orders.unshift(fileOrder);
   await writeDB(db);
 
-  // Send WhatsApp confirmation if order is already paid (file-based DB)
-  if (paid) {
-    try {
-      const user = await getUserById(userId);
-      if (user && user.mobile) {
-        const { sendOrderConfirmation } = require("./whatsapp");
-
-        // Generate invoice URL
-        const invoiceUrl = `${
-          process.env.FRONTEND_URL || "http://localhost:3000"
-        }/invoice/${id}`;
-
-        await sendOrderConfirmation(user, fileOrder, invoiceUrl);
-        console.log(
-          `WhatsApp confirmation sent to ${user.mobile} for new paid order ${id}`
-        );
-      }
-    } catch (whatsappError) {
-      console.error(
-        "Failed to send WhatsApp confirmation for new order:",
-        whatsappError
-      );
-    }
-  }
-
+  console.log(`✅ Order created successfully with ID: ${id}`);
   return fileOrder;
 }
 
@@ -167,51 +119,7 @@ async function payOrder(userId, orderId) {
     o.status = "Paid";
     await o.save();
 
-    // Send WhatsApp confirmation after successful payment
-    try {
-      console.log("🔍 Attempting to send WhatsApp confirmation...");
-      const user = await getUserById(userId);
-      console.log(
-        "👤 User found:",
-        user ? `${user.name} (${user.mobile})` : "No user found"
-      );
-
-      if (user && user.mobile) {
-        const { sendOrderConfirmation } = require("./whatsapp");
-
-        // Generate invoice URL (you can customize this)
-        const invoiceUrl = `${
-          process.env.FRONTEND_URL || "http://localhost:3000"
-        }/invoice/${orderId}`;
-        console.log("🔗 Invoice URL:", invoiceUrl);
-
-        const whatsappResult = await sendOrderConfirmation(
-          user,
-          o.toObject(),
-          invoiceUrl
-        );
-
-        if (whatsappResult.success) {
-          console.log(
-            `✅ WhatsApp confirmation sent successfully to ${user.mobile} for order ${orderId}`
-          );
-          console.log(`📱 Message SID: ${whatsappResult.data?.sid}`);
-        } else {
-          console.log(
-            `❌ WhatsApp confirmation failed for order ${orderId}:`,
-            whatsappResult.error
-          );
-        }
-      } else {
-        console.log(
-          "⚠️ No user or mobile number found for WhatsApp notification"
-        );
-      }
-    } catch (whatsappError) {
-      console.error("❌ WhatsApp confirmation error:", whatsappError.message);
-      // Don't fail the payment if WhatsApp fails
-    }
-
+    console.log(`✅ Order ${orderId} marked as paid successfully`);
     return o.toObject();
   }
 
@@ -223,27 +131,7 @@ async function payOrder(userId, orderId) {
   db.orders[idx].status = "Paid";
   await writeDB(db);
 
-  // Send WhatsApp confirmation for file-based DB
-  try {
-    const user = await getUserById(userId);
-    if (user && user.mobile) {
-      const { sendOrderConfirmation } = require("./whatsapp");
-
-      // Generate invoice URL
-      const invoiceUrl = `${
-        process.env.FRONTEND_URL || "http://localhost:3000"
-      }/invoice/${orderId}`;
-
-      await sendOrderConfirmation(user, db.orders[idx], invoiceUrl);
-      console.log(
-        `WhatsApp confirmation sent to ${user.mobile} for order ${orderId}`
-      );
-    }
-  } catch (whatsappError) {
-    console.error("Failed to send WhatsApp confirmation:", whatsappError);
-    // Don't fail the payment if WhatsApp fails
-  }
-
+  console.log(`✅ Order ${orderId} marked as paid successfully`);
   return db.orders[idx];
 }
 

@@ -49,11 +49,11 @@ function formatDateForDisplay(dateInput) {
 }
 
 /**
- * Format date for WhatsApp messages
+ * Format date for display purposes
  * @param {string|Date} dateInput - Date string or Date object
- * @returns {string} Formatted date string for WhatsApp
+ * @returns {string} Formatted date string for display
  */
-function formatDateForWhatsApp(dateInput) {
+function formatDateForDisplay(dateInput) {
   try {
     const date = new Date(dateInput);
     return date.toLocaleString("en-IN", {
@@ -66,7 +66,7 @@ function formatDateForWhatsApp(dateInput) {
       timeZone: "Asia/Kolkata",
     });
   } catch (error) {
-    console.error("WhatsApp date formatting error:", error);
+    console.error("Date formatting error:", error);
     return "Invalid Date";
   }
 }
@@ -113,7 +113,6 @@ module.exports = {
   getCurrentIST,
   getISTDateForDB,
   formatDateForDisplay,
-  formatDateForWhatsApp,
   formatDateForInvoice,
   getISTTimestamp,
 };

@@ -8,7 +8,6 @@ const productsRoutes = require("./routes/products");
 const ordersRoutes = require("./routes/orders");
 const payRoutes = require("./routes/pay");
 const adminRoutes = require("./routes/admin");
-const whatsappWebhookRoutes = require("./routes/whatsapp-webhook");
 const { connectMongo } = require("./utils/mongo");
 const Product = require("./models/Product");
 const fs = require("fs");
@@ -25,7 +24,6 @@ app.use("/api/products", productsRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/pay", payRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/whatsapp", whatsappWebhookRoutes);
 
 async function start() {
   const mongoUri = process.env.MONGO_URI;

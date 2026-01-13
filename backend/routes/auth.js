@@ -80,11 +80,11 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
         to: mobile,
       });
       console.log(
-        `OTP sent successfully via Twilio. SID: ${message.sid}, To: ${mobile}`
+        `OTP sent successfully via Twilio SMS. SID: ${message.sid}, To: ${mobile}`
       );
-      resp.message = "OTP sent";
+      resp.message = "OTP sent via SMS";
     } catch (e) {
-      console.error("Twilio send failed:", {
+      console.error("Twilio SMS send failed:", {
         error: e.message,
         code: e.code,
         status: e.status,
@@ -95,7 +95,7 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
       // Return more detailed error in development, generic in production
       const errorMsg =
         process.env.NODE_ENV === "development"
-          ? `Failed to send OTP: ${e.message || "Unknown error"}`
+          ? `Failed to send OTP via SMS: ${e.message || "Unknown error"}`
           : "Failed to send OTP. Please check server logs for details.";
       return res.status(500).json({
         error: errorMsg,
@@ -118,6 +118,7 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
     // DEV fallback only
     if (process.env.NODE_ENV === "development") {
       resp.otp = code;
+      resp.message = "OTP generated (dev mode - SMS not configured)";
       resp.warning =
         "Twilio not configured. OTP returned in response for development only.";
     } else {
