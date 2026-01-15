@@ -121,8 +121,10 @@ export default function Orders() {
       <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Your Orders
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Track your current and past orders
           </p>
         </div>
@@ -223,7 +225,7 @@ export default function Orders() {
 
                 {/* Total and Actions */}
                 <div className="flex items-center justify-between gap-3 pt-2 border-t">
-                  <div className="text-xl font-bold text-gray-900">
+                  <div className="text-lg sm:text-xl font-bold text-gray-900">
                     ₹{getTotal(order)}
                   </div>
 
@@ -232,7 +234,7 @@ export default function Orders() {
                       onClick={() =>
                         setExpanded(expanded === order._id ? null : order._id)
                       }
-                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50 transition"
+                      className="rounded-lg border border-gray-300 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium hover:bg-gray-50 transition"
                     >
                       {expanded === order._id ? "Hide" : "Details"}
                     </button>
@@ -241,7 +243,7 @@ export default function Orders() {
                       order.status === "Completed") && (
                       <button
                         onClick={() => setShowReceipt(order)}
-                        className="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-600 transition"
+                        className="rounded-lg bg-blue-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-blue-600 transition"
                       >
                         Receipt
                       </button>
@@ -252,7 +254,7 @@ export default function Orders() {
                         onClick={() =>
                           navigate("/checkout", { state: { order } })
                         }
-                        className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-green-700 transition"
+                        className="rounded-lg bg-green-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-green-700 transition"
                       >
                         Pay Now
                       </button>

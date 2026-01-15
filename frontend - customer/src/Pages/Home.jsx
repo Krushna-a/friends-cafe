@@ -32,10 +32,12 @@ const Home = () => {
       <div className="relative z-10 h-full w-full flex items-center justify-center top-50">
         <div className="bg-white/80 p-8 rounded-2xl shadow-lg text-center flex flex-col items-center ">
           <img src={logo} alt="logo" className="h-30" />
-          <h1 className="text-2xl font-bold">#FCC FRIENDS CLUB CAFE</h1>
+          <h1 className="text-lg sm:text-2xl font-bold">
+            #FCC FRIENDS CLUB CAFE
+          </h1>
           <NavLink
             to="/menu"
-            className="mt-4 bg-orange-500 text-white px-6 py-3 rounded-lg"
+            className="mt-4 bg-orange-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base"
           >
             Order Now →
           </NavLink>

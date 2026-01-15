@@ -230,14 +230,16 @@ export default function Checkout() {
       {/* Header */}
       <div className="py-4 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Pay Bill</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+            Pay Bill
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-500">
             Review items and complete payment.
           </p>
         </div>
         <button
           onClick={handleGoBack}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
         >
           <span>←</span>
           <span>Go Back</span>
@@ -301,7 +303,7 @@ export default function Checkout() {
             <span>{source.reduce((s, it) => s + it.qty, 0)}</span>
           </div>
 
-          <div className="flex items-center justify-between mt-2 text-lg font-semibold">
+          <div className="flex items-center justify-between mt-2 text-base sm:text-lg font-semibold">
             <span>Total</span>
             <span>{formatCurrency(total)}</span>
           </div>
@@ -334,8 +336,10 @@ export default function Checkout() {
               <span>Back</span>
             </button>
             <div>
-              <div className="text-sm text-gray-600">Total to pay</div>
-              <div className="text-xl font-semibold">
+              <div className="text-xs sm:text-sm text-gray-600">
+                Total to pay
+              </div>
+              <div className="text-lg sm:text-xl font-semibold">
                 {formatCurrency(total)}
               </div>
             </div>
@@ -344,7 +348,7 @@ export default function Checkout() {
           <button
             onClick={handlePay}
             disabled={paid}
-            className={`rounded-full px-6 py-3 font-semibold text-white transition ${
+            className={`rounded-full px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white transition ${
               paid ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
             }`}
           >

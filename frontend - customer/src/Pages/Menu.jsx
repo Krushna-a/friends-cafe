@@ -118,7 +118,7 @@ export default function Menu() {
             placeholder="Search item"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border px-4 py-2 text-lg shadow-sm outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full rounded-xl border px-4 py-2 text-sm sm:text-lg shadow-sm outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
 
@@ -146,7 +146,7 @@ export default function Menu() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span className="mt-1 text-md font-medium whitespace-nowrap">
+              <span className="mt-1 text-xs sm:text-sm font-medium whitespace-nowrap">
                 {cat}
               </span>
             </button>
@@ -166,7 +166,7 @@ export default function Menu() {
           return (
             <div key={cat} ref={(el) => (sectionRefs.current[cat] = el)}>
               {/* Category Title */}
-              <h2 className="mb-3 text-lg font-semibold text-gray-900">
+              <h2 className="mb-3 text-base sm:text-lg font-semibold text-gray-900">
                 {cat} ({filteredItems.length})
               </h2>
 
@@ -182,10 +182,10 @@ export default function Menu() {
                     >
                       {/* Left Info */}
                       <div className="flex-1 pr-3">
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm sm:text-lg font-semibold text-gray-900">
                           {item.name}
                         </p>
-                        <p className="text-lg text-gray-700 mt-1">
+                        <p className="text-sm sm:text-lg text-gray-700 mt-1">
                           ₹ {item.price}.00
                         </p>
                       </div>
@@ -211,18 +211,18 @@ export default function Menu() {
                               onClick={() =>
                                 updateQty(cartItem.name, cartItem.qty - 1)
                               }
-                              className="px-2 text-lg font-bold"
+                              className="px-2 text-sm sm:text-lg font-bold"
                             >
                               –
                             </button>
-                            <div className="px-2 text-lg font-semibold">
+                            <div className="px-2 text-sm sm:text-lg font-semibold">
                               {cartItem.qty}
                             </div>
                             <button
                               onClick={() =>
                                 updateQty(cartItem.name, cartItem.qty + 1)
                               }
-                              className="px-2 text-lg font-bold"
+                              className="px-2 text-sm sm:text-lg font-bold"
                             >
                               +
                             </button>
@@ -237,7 +237,7 @@ export default function Menu() {
                                 qty: 1,
                               })
                             }
-                            className="absolute -bottom-3 rounded-lg border border-orange-500 bg-white px-4 py-1 text-sm font-semibold text-orange-500 shadow-sm hover:bg-orange-50 transition"
+                            className="absolute -bottom-3 rounded-lg border border-orange-500 bg-white px-3 py-1 text-xs sm:text-sm font-semibold text-orange-500 shadow-sm hover:bg-orange-50 transition"
                           >
                             + Add
                           </button>

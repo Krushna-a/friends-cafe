@@ -4,7 +4,7 @@ import { useCart } from "../context/CartContext";
 import { useUser } from "../context/UserContext";
 
 export default function CartModal({ open, onClose }) {
-  const { cart, updateQty, removeItem, cartTotal } = useCart();
+  const { cart, updateQty, cartTotal } = useCart();
   const { user, setShowAuth } = useUser();
   const navigate = useNavigate();
 
@@ -16,7 +16,6 @@ export default function CartModal({ open, onClose }) {
   }, [cart.length, open, onClose]);
 
   if (!open) return null;
-
 
   // Handle Pay Now button
   const handlePayNow = () => {
@@ -43,10 +42,15 @@ export default function CartModal({ open, onClose }) {
       <div className="w-full max-w-3xl rounded-t-3xl bg-white p-5">
         <div className="flex justify-between">
           <div>
-            <h3 className="text-xl font-semibold">Your Cart</h3>
-            <div className="text-base text-gray-500">{cart.length} items</div>
+            <h3 className="text-lg sm:text-xl font-semibold">Your Cart</h3>
+            <div className="text-sm sm:text-base text-gray-500">
+              {cart.length} items
+            </div>
           </div>
-          <button onClick={onClose} className="text-base text-gray-600">
+          <button
+            onClick={onClose}
+            className="text-sm sm:text-base text-gray-600"
+          >
             Close
           </button>
         </div>
@@ -74,30 +78,26 @@ export default function CartModal({ open, onClose }) {
 
               {/* Product Info */}
               <div className="flex-1">
-                <div className="text-lg font-medium">{it.name}</div>
-                <div className="text-base text-gray-500">₹ {it.price}.00</div>
+                <div className="text-sm sm:text-lg font-medium">{it.name}</div>
+                <div className="text-sm sm:text-base text-gray-500">
+                  ₹ {it.price}.00
+                </div>
               </div>
 
               {/* Quantity Controls */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => updateQty(it.name, it.qty - 1)}
-                  className="px-3 py-1 border rounded-lg text-lg"
+                  className="px-2 sm:px-3 py-1 border rounded-lg text-sm sm:text-lg"
                 >
                   –
                 </button>
-                <div className="text-lg font-semibold">{it.qty}</div>
+                <div className="text-sm sm:text-lg font-semibold">{it.qty}</div>
                 <button
                   onClick={() => updateQty(it.name, it.qty + 1)}
-                  className="px-3 py-1 border rounded-lg text-lg"
+                  className="px-2 sm:px-3 py-1 border rounded-lg text-sm sm:text-lg"
                 >
                   +
-                </button>
-                <button
-                  onClick={() => removeItem(it.name)}
-                  className="text-base text-red-500"
-                >
-                  Remove
                 </button>
               </div>
             </div>
@@ -105,10 +105,12 @@ export default function CartModal({ open, onClose }) {
         </div>
 
         <div className="mt-4 border-t pt-4 flex justify-between items-center">
-          <div className="text-lg font-semibold">Total: ₹ {cartTotal}.00</div>
+          <div className="text-base sm:text-lg font-semibold">
+            Total: ₹ {cartTotal}.00
+          </div>
           <button
             onClick={handlePayNow}
-            className="rounded-lg bg-green-600 px-6 py-2 text-white font-semibold text-base hover:bg-green-700 transition"
+            className="rounded-lg bg-green-600 px-4 sm:px-6 py-2 text-white font-semibold text-sm sm:text-base hover:bg-green-700 transition"
           >
             Pay Now
           </button>

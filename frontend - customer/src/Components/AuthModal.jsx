@@ -40,8 +40,7 @@ export default function AuthModal() {
   const onSend = async () => {
     if (!mobile || mobile.length < 10)
       return setError("Enter a valid 10-digit mobile number");
-    if (!name || name.trim().length < 2)
-      return setError("Enter your name");
+    if (!name || name.trim().length < 2) return setError("Enter your name");
     setError(null);
     try {
       const code = await sendOtp({ mobile, name: name.trim() });
@@ -53,8 +52,7 @@ export default function AuthModal() {
   };
 
   const onVerify = async () => {
-    if (!otp || otp.length !== 6)
-      return setError("Enter a valid 6-digit OTP");
+    if (!otp || otp.length !== 6) return setError("Enter a valid 6-digit OTP");
     setError(null);
     try {
       const ok = await verifyOtp({ mobile, code: otp });
@@ -71,10 +69,10 @@ export default function AuthModal() {
       <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
-          <h3 className="text-2xl font-bold mb-1">
+          <h3 className="text-xl sm:text-2xl font-bold mb-1">
             {existingUser ? "Welcome Back!" : "Create Account"}
           </h3>
-          <p className="text-orange-100 text-base">
+          <p className="text-orange-100 text-sm sm:text-base">
             {existingUser
               ? `Hi ${existingUser.name}! Verify with OTP`
               : "Enter your details to get started"}
@@ -86,7 +84,7 @@ export default function AuthModal() {
             <div className="space-y-5">
               {/* Mobile */}
               <div>
-                <label className="block text-base font-medium text-gray-700 mb-2">
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
                   Mobile Number *
                 </label>
                 <input
@@ -95,28 +93,28 @@ export default function AuthModal() {
                   onChange={(e) =>
                     setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
                   }
-                  className="w-full border-2 rounded-xl px-4 py-3 text-lg focus:border-orange-500 outline-none"
+                  className="w-full border-2 rounded-xl px-4 py-2 sm:py-3 text-sm sm:text-lg focus:border-orange-500 outline-none"
                   placeholder="9876543210"
                 />
               </div>
 
               {/* Name */}
               <div>
-                <label className="block text-base font-medium text-gray-700 mb-2">
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
                   Your Name *
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full border-2 rounded-xl px-4 py-3 text-lg focus:border-orange-500 outline-none"
+                  className="w-full border-2 rounded-xl px-4 py-2 sm:py-3 text-sm sm:text-lg focus:border-orange-500 outline-none"
                   placeholder="Your name"
                   disabled={existingUser?.name}
                 />
               </div>
 
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-base text-red-600">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm sm:text-base text-red-600">
                   {error}
                 </div>
               )}
@@ -124,13 +122,13 @@ export default function AuthModal() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setShowAuth(false)}
-                  className="flex-1 rounded-xl border px-4 py-3 text-base font-medium"
+                  className="flex-1 rounded-xl border px-4 py-2 sm:py-3 text-sm sm:text-base font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={onSend}
-                  className="flex-1 rounded-xl bg-orange-500 px-4 py-3 text-base font-semibold text-white"
+                  className="flex-1 rounded-xl bg-orange-500 px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white"
                 >
                   Send OTP
                 </button>
@@ -141,8 +139,8 @@ export default function AuthModal() {
           {step === 2 && (
             <div className="space-y-5">
               <div className="text-center">
-                <h4 className="text-xl font-semibold">Enter OTP</h4>
-                <p className="text-base text-gray-500">
+                <h4 className="text-lg sm:text-xl font-semibold">Enter OTP</h4>
+                <p className="text-sm sm:text-base text-gray-500">
                   Sent to <span className="font-medium">{mobile}</span>
                 </p>
               </div>
@@ -153,7 +151,7 @@ export default function AuthModal() {
                 onChange={(e) =>
                   setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
                 }
-                className="w-full border-2 rounded-xl px-4 py-3 text-center text-3xl tracking-widest focus:border-orange-500 outline-none"
+                className="w-full border-2 rounded-xl px-4 py-3 text-center text-2xl sm:text-3xl tracking-widest focus:border-orange-500 outline-none"
                 placeholder="000000"
                 maxLength={6}
               />
@@ -166,7 +164,7 @@ export default function AuthModal() {
               )}
 
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-base text-red-600">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm sm:text-base text-red-600">
                   {error}
                 </div>
               )}
@@ -174,13 +172,13 @@ export default function AuthModal() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 rounded-xl border px-4 py-3 text-base"
+                  className="flex-1 rounded-xl border px-4 py-2 sm:py-3 text-sm sm:text-base"
                 >
                   Back
                 </button>
                 <button
                   onClick={onVerify}
-                  className="flex-1 rounded-xl bg-orange-500 px-4 py-3 text-base font-semibold text-white"
+                  className="flex-1 rounded-xl bg-orange-500 px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white"
                 >
                   Verify
                 </button>
@@ -190,10 +188,10 @@ export default function AuthModal() {
 
           {step === 3 && (
             <div className="text-center py-8">
-              <h4 className="text-2xl font-bold text-green-600 mb-2">
+              <h4 className="text-xl sm:text-2xl font-bold text-green-600 mb-2">
                 Login Successful 🎉
               </h4>
-              <p className="text-base text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 You can now place orders and pay easily.
               </p>
             </div>
