@@ -10,6 +10,11 @@ import Footer from "./Components/Footer";
 import Orders from "./Pages/Orders";
 import Checkout from "./Pages/Checkout";
 import Invoice from "./Pages/Invoice";
+import PrivacyPolicy from "./Pages/PrivacyPolicy";
+import TermsConditions from "./Pages/TermsConditions";
+import RefundPolicy from "./Pages/RefundPolicy";
+import Disclaimer from "./Pages/Disclaimer";
+import Contact from "./Pages/Contact";
 import { CartProvider, useCart } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
 import CartBar from "./Components/CartBar";
@@ -21,8 +26,16 @@ const AppLayout = () => {
   const [showCart, setShowCart] = React.useState(false);
   const location = useLocation();
 
-  // Hide CartBar on checkout page
-  const showCartBar = location.pathname !== "/checkout";
+  // Hide CartBar on checkout page and policy pages
+  const hideCartBarPaths = [
+    "/checkout",
+    "/privacy-policy",
+    "/terms-conditions",
+    "/refund-policy",
+    "/disclaimer",
+    "/contact",
+  ];
+  const showCartBar = !hideCartBarPaths.includes(location.pathname);
 
   return (
     <>
@@ -33,6 +46,11 @@ const AppLayout = () => {
         <Route path="/orders" element={<Orders />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/invoice/:orderId" element={<Invoice />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
 
       <Footer />

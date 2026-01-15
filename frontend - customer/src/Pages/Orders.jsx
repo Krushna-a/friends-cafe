@@ -117,55 +117,61 @@ export default function Orders() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-3 sm:px-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="py-4">
-        <h1 className="text-xl font-semibold text-gray-900">Your Orders</h1>
-        <p className="text-lg text-gray-500">
-          Track your current and past orders.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">Your Orders</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Track your current and past orders
+          </p>
+        </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
-        {[
-          "All",
-          "Pending Payment",
-          "Paid",
-          "Preparing",
-          "Ready",
-          "Completed",
-        ].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-              filter === f
-                ? "bg-orange-500 text-white shadow"
-                : "bg-white border text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+        {/* Filter Tabs */}
+        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 no-scrollbar">
+          {[
+            "All",
+            "Pending Payment",
+            "Paid",
+            "Preparing",
+            "Ready",
+            "Completed",
+          ].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition whitespace-nowrap ${
+                filter === f
+                  ? "bg-orange-500 text-white shadow-md"
+                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
 
-      {/* Orders List */}
-      <div className="space-y-4">
-        {filtered.map((order) => (
-          <div
-            key={order._id}
-            className="rounded-2xl bg-white p-4 shadow-sm hover:shadow-md transition"
-          >
-            <div className="flex items-start justify-between gap-4">
-              {/* Left */}
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {order._id}
+        {/* Orders List */}
+        <div className="space-y-4">
+          {filtered.map((order) => (
+            <div
+              key={order._id}
+              className="rounded-2xl bg-white p-4 shadow-sm hover:shadow-md transition"
+            >
+              {/* Mobile Layout */}
+              <div className="flex flex-col gap-3">
+                {/* Order Header */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-500 mb-1">
+                      Order ID
+                    </div>
+                    <div className="text-xs font-mono text-gray-700 break-all">
+                      {order._id}
+                    </div>
                   </div>
                   <div
-                    className={`text-sm px-3 py-1 rounded-full font-semibold ${
+                    className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-semibold ${
                       order.status === "Pending Payment"
                         ? "bg-red-100 text-red-700"
                         : order.status === "Paid"
@@ -181,7 +187,8 @@ export default function Orders() {
                   </div>
                 </div>
 
-                <div className="mt-2 text-sm text-gray-500">
+                {/* Date and Time */}
+                <div className="text-sm text-gray-500">
                   {formatDate(order.createdAt)}
                   {order.eta && (
                     <span className="ml-2">• ETA {order.eta} min</span>
@@ -189,149 +196,157 @@ export default function Orders() {
                 </div>
 
                 {/* Item Thumbnails */}
-                <div className="mt-3 flex items-center gap-2">
-                  {order.items.slice(0, 3).map((it, i) =>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {order.items.slice(0, 4).map((it, i) =>
                     it.image ? (
                       <img
                         key={i}
                         src={it.image}
                         alt={it.name}
-                        className="h-12 w-12 rounded-lg object-cover"
+                        className="h-14 w-14 shrink-0 rounded-lg object-cover"
                       />
                     ) : (
                       <div
                         key={i}
-                        className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-sm"
+                        className="h-14 w-14 shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-xs"
                       >
                         No Img
                       </div>
                     )
                   )}
-                </div>
-              </div>
-
-              {/* Right */}
-              <div className="flex flex-col items-end gap-2">
-                <div className="text-lg font-semibold text-gray-900">
-                  ₹ {getTotal(order)}.00
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() =>
-                      setExpanded(expanded === order._id ? null : order._id)
-                    }
-                    className="rounded-lg border px-3 py-1 text-sm font-medium hover:bg-gray-100"
-                  >
-                    Details
-                  </button>
-
-                  {(order.status === "Paid" ||
-                    order.status === "Completed") && (
-                    <button
-                      onClick={() => setShowReceipt(order)}
-                      className="rounded-lg bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600 transition"
-                    >
-                      Receipt
-                    </button>
-                  )}
-
-                  {order.status === "Pending Payment" && (
-                    <button
-                      onClick={() =>
-                        navigate("/checkout", { state: { order } })
-                      }
-                      className="rounded-lg bg-green-600 px-3 py-1 text-sm font-semibold text-white hover:bg-green-700 transition"
-                    >
-                      Pay Now
-                    </button>
+                  {order.items.length > 4 && (
+                    <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-medium">
+                      +{order.items.length - 4}
+                    </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* Expanded Details */}
-            {expanded === order._id && (
-              <div className="mt-4 border-t pt-4">
-                <div className="space-y-3">
-                  {order.items.map((it, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        {it.image ? (
-                          <img
-                            src={it.image}
-                            alt={it.name}
-                            className="h-12 w-12 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-sm">
-                            No Img
-                          </div>
-                        )}
-                        <div>
-                          <div className="text-lg font-medium">{it.name}</div>
-                          <div className="text-sm text-gray-500">
-                            Qty: {it.qty}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-lg font-medium">
-                        ₹ {it.price * it.qty}.00
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="flex items-center justify-between border-t pt-3">
-                    <div className="text-lg text-gray-600">Total</div>
-                    <div className="text-lg font-semibold">
-                      ₹ {getTotal(order)}.00
-                    </div>
+                {/* Total and Actions */}
+                <div className="flex items-center justify-between gap-3 pt-2 border-t">
+                  <div className="text-xl font-bold text-gray-900">
+                    ₹{getTotal(order)}
                   </div>
 
-                  {(order.status === "Paid" ||
-                    order.status === "Completed") && (
-                    <div className="mt-4 flex justify-center">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() =>
+                        setExpanded(expanded === order._id ? null : order._id)
+                      }
+                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50 transition"
+                    >
+                      {expanded === order._id ? "Hide" : "Details"}
+                    </button>
+
+                    {(order.status === "Paid" ||
+                      order.status === "Completed") && (
                       <button
                         onClick={() => setShowReceipt(order)}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 font-medium transition"
+                        className="rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-600 transition"
                       >
-                        View Receipt
+                        Receipt
                       </button>
-                    </div>
-                  )}
+                    )}
 
-                  {order.status === "Pending Payment" && (
-                    <div className="mt-4 flex justify-center">
+                    {order.status === "Pending Payment" && (
                       <button
                         onClick={() =>
                           navigate("/checkout", { state: { order } })
                         }
-                        className="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-700 font-medium transition"
+                        className="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-green-700 transition"
                       >
                         Pay Now
                       </button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
 
-        {filtered.length === 0 && (
-          <div className="text-center text-gray-500 py-12">
-            No orders found.
-          </div>
+              {/* Expanded Details */}
+              {expanded === order._id && (
+                <div className="mt-4 border-t pt-4">
+                  <div className="space-y-3">
+                    {order.items.map((it, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        {it.image ? (
+                          <img
+                            src={it.image}
+                            alt={it.name}
+                            className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="h-16 w-16 shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
+                            No Img
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-gray-900 truncate">
+                            {it.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            Qty: {it.qty} × ₹{it.price}
+                          </div>
+                        </div>
+                        <div className="text-base font-semibold text-gray-900 shrink-0">
+                          ₹{it.price * it.qty}
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex items-center justify-between border-t pt-3 text-base">
+                      <div className="font-medium text-gray-700">Total</div>
+                      <div className="text-xl font-bold text-gray-900">
+                        ₹{getTotal(order)}
+                      </div>
+                    </div>
+
+                    {(order.status === "Paid" ||
+                      order.status === "Completed") && (
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={() => setShowReceipt(order)}
+                          className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition"
+                        >
+                          View Receipt
+                        </button>
+                      </div>
+                    )}
+
+                    {order.status === "Pending Payment" && (
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={() =>
+                            navigate("/checkout", { state: { order } })
+                          }
+                          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 font-medium transition"
+                        >
+                          Complete Payment
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {filtered.length === 0 && (
+            <div className="text-center text-gray-500 py-12">
+              <div className="text-4xl mb-3">📦</div>
+              <p className="text-lg font-medium mb-1">No orders found</p>
+              <p className="text-sm">
+                {filter === "All"
+                  ? "You haven't placed any orders yet"
+                  : `No ${filter.toLowerCase()} orders`}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Receipt Modal */}
+        {showReceipt && (
+          <Receipt order={showReceipt} onClose={() => setShowReceipt(null)} />
         )}
       </div>
-
-      {/* Receipt Modal */}
-      {showReceipt && (
-        <Receipt order={showReceipt} onClose={() => setShowReceipt(null)} />
-      )}
     </div>
   );
 }
