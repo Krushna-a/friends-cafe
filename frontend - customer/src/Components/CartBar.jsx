@@ -20,25 +20,25 @@ export default function CartBar({ cartCount, total, onOpenCart }) {
   };
 
   return (
-    <div className="fixed left-0 right-0 bottom-14 z-40 px-4">
-      <div className="max-w-3xl mx-auto rounded-2xl bg-white border p-4 flex items-center justify-between shadow-lg">
+    <div className="fixed left-0 right-0 bottom-16 z-40 px-4">
+      <div className="max-w-3xl mx-auto rounded-full bg-white border p-4 flex items-center justify-between shadow-lg">
         <div>
-          <div className="text-sm sm:text-base text-gray-600">
+          <div className="text-xs sm:text-base text-gray-600">
             {cartCount} items
           </div>
-          <div className="text-lg sm:text-xl font-bold">₹ {total}.00</div>
+          <div className="text-sm sm:text-xl font-bold">₹ {total}.00</div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenCart}
-            className="rounded-lg border px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base"
+            className="rounded-full border px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base"
           >
             View Cart
           </button>
           <button
             onClick={handlePayNow}
-            className="rounded-lg bg-green-600 px-3 sm:px-4 py-1.5 sm:py-2 text-white font-semibold text-sm sm:text-base"
+            className="rounded-full bg-[#6F4E37] px-3 sm:px-4 py-1.5 sm:py-2 text-white font-semibold text-sm sm:text-base"
           >
             Pay Now
           </button>

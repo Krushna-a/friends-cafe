@@ -226,136 +226,136 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-3 sm:px-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="py-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-            Pay Bill
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-500">
-            Review items and complete payment.
-          </p>
-        </div>
-        <button
-          onClick={handleGoBack}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+  <div className="min-h-screen bg-[#EFE6D8] px-3 py-2 sm:px-5 max-w-7xl mx-auto pb-28">
+    
+    {/* Header */}
+    <div className="py-3 flex items-center justify-between">
+      <div>
+        <h2 className="text-base sm:text-lg font-semibold text-[#3B2A1F]">
+          Pay Bill
+        </h2>
+        <p className="text-xs text-[#6F4E37]/70">
+          Review items and complete payment
+        </p>
+      </div>
+      <button
+        onClick={handleGoBack}
+        className="flex items-center gap-1 rounded-full border border-[#6F4E37]/30 bg-[#F6EFE6] px-3 py-1 text-xs font-medium text-[#6F4E37] hover:bg-[#6F4E37]/10 transition"
+      >
+        ← Back
+      </button>
+    </div>
+
+    {/* Items */}
+    <div className="space-y-2">
+      {source.map((it, idx) => (
+        <div
+          key={idx}
+          className="flex items-center justify-between rounded-xl bg-[#F6EFE6] p-2 shadow-sm"
         >
-          <span>←</span>
-          <span>Go Back</span>
-        </button>
-      </div>
-
-      {/* Items */}
-      <div className="space-y-4">
-        {source.map((it, idx) => (
-          <div
-            key={idx}
-            className="flex items-center justify-between rounded-2xl bg-white p-3 shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              {it.image ? (
-                <img
-                  src={it.image}
-                  alt={it.name}
-                  className="h-16 w-16 rounded-xl object-cover"
-                />
-              ) : (
-                <div className="h-16 w-16 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                  No Image
-                </div>
-              )}
-              <div>
-                <div className="font-medium text-gray-900">{it.name}</div>
-                <div className="text-sm text-gray-500">
-                  {formatCurrency(it.price)}
-                </div>
+          {/* Left */}
+          <div className="flex items-center gap-2">
+            {it.image ? (
+              <img
+                src={it.image}
+                alt={it.name}
+                className="h-14 w-14 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="h-14 w-14 rounded-lg bg-[#E5D6C5] flex items-center justify-center text-xs text-[#6F4E37]/60">
+                No Image
               </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex items-center gap-2 rounded-full border px-2 py-1">
-                <button
-                  onClick={() => changeQty(idx, -1)}
-                  className="px-2 font-semibold text-gray-700"
-                >
-                  –
-                </button>
-                <div className="px-2 text-sm font-semibold">{it.qty}</div>
-                <button
-                  onClick={() => changeQty(idx, +1)}
-                  className="px-2 font-semibold text-gray-700"
-                >
-                  +
-                </button>
-              </div>
-              <div className="text-sm font-semibold text-gray-900">
-                {formatCurrency(it.price * it.qty)}
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* Summary */}
-        <div className="mt-4 rounded-2xl bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <span>Items</span>
-            <span>{source.reduce((s, it) => s + it.qty, 0)}</span>
-          </div>
-
-          <div className="flex items-center justify-between mt-2 text-base sm:text-lg font-semibold">
-            <span>Total</span>
-            <span>{formatCurrency(total)}</span>
-          </div>
-        </div>
-
-        {/* Payment Info */}
-        <div className="mt-4 rounded-2xl bg-gray-100 p-4">
-          <div className="text-sm text-gray-700 mb-1">
-            <span className="font-medium">Payment:</span> Online (UPI)
-          </div>
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">Phone:</span>{" "}
-            {user.mobile || "Not set"}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">
-            Google Pay, PhonePe, PayTM supported
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Pay Bar */}
-      <div className="fixed left-0 right-0 bottom-0 z-50 border-t bg-white p-4">
-        <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleGoBack}
-              className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800 transition"
-            >
-              <span>←</span>
-              <span>Back</span>
-            </button>
+            )}
             <div>
-              <div className="text-xs sm:text-sm text-gray-600">
-                Total to pay
+              <div className="text-sm font-medium text-[#3B2A1F] leading-tight">
+                {it.name}
               </div>
-              <div className="text-lg sm:text-xl font-semibold">
-                {formatCurrency(total)}
+              <div className="text-xs text-[#6F4E37]/70">
+                {formatCurrency(it.price)}
               </div>
             </div>
           </div>
 
-          <button
-            onClick={handlePay}
-            disabled={paid}
-            className={`rounded-full px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white transition ${
-              paid ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
-            }`}
-          >
-            {paid ? "Processing..." : "Pay Now"}
-          </button>
+          {/* Right */}
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-1 rounded-full border border-[#6F4E37]/30 px-1.5 py-0.5">
+              <button
+                onClick={() => changeQty(idx, -1)}
+                className="h-6 w-6 rounded-full text-[#6F4E37] hover:bg-[#6F4E37]/10"
+              >
+                –
+              </button>
+              <div className="w-5 text-center text-xs font-semibold text-[#3B2A1F]">
+                {it.qty}
+              </div>
+              <button
+                onClick={() => changeQty(idx, +1)}
+                className="h-6 w-6 rounded-full text-[#6F4E37] hover:bg-[#6F4E37]/10"
+              >
+                +
+              </button>
+            </div>
+
+            <div className="text-xs font-semibold text-[#3B2A1F]">
+              {formatCurrency(it.price * it.qty)}
+            </div>
+          </div>
         </div>
+      ))}
+    </div>
+
+    {/* Summary */}
+    <div className="mt-3 rounded-xl bg-[#F6EFE6] p-3 shadow-sm">
+      <div className="flex items-center justify-between text-xs text-[#6F4E37]/80">
+        <span>Items</span>
+        <span>{source.reduce((s, it) => s + it.qty, 0)}</span>
+      </div>
+      <div className="flex items-center justify-between mt-2 text-sm font-semibold text-[#3B2A1F]">
+        <span>Total</span>
+        <span>{formatCurrency(total)}</span>
       </div>
     </div>
-  );
+
+    {/* Payment Info */}
+    <div className="mt-3 rounded-xl bg-[#EDE1D2] p-3">
+      <div className="text-xs text-[#3B2A1F] mb-0.5">
+        <span className="font-medium">Payment:</span> Online (UPI)
+      </div>
+      <div className="text-xs text-[#6F4E37]/80">
+        <span className="font-medium">Phone:</span>{" "}
+        {user.mobile || "Not set"}
+      </div>
+      <div className="text-[11px] text-[#6F4E37]/60 mt-1">
+        Google Pay, PhonePe, Paytm supported
+      </div>
+    </div>
+
+    {/* Bottom Pay Bar */}
+    <div className="fixed left-0 right-0 bottom-0 z-50 border-t border-[#6F4E37]/20 bg-[#EFE6D8]/95 backdrop-blur">
+      <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
+        <div>
+          <div className="text-xs text-[#6F4E37]/70">
+            Total to pay
+          </div>
+          <div className="text-lg font-semibold text-[#3B2A1F]">
+            {formatCurrency(total)}
+          </div>
+        </div>
+
+        <button
+          onClick={handlePay}
+          disabled={paid}
+          className={`rounded-full px-6 py-2 text-sm font-semibold text-white shadow transition ${
+            paid
+              ? "bg-[#6F4E37]/40"
+              : "bg-[#6F4E37] hover:opacity-90"
+          }`}
+        >
+          {paid ? "Processing…" : "Pay Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 }

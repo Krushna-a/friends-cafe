@@ -92,45 +92,49 @@ export default function Orders() {
     }
   };
 
+  /* NOT LOGGED IN */
   if (!user) {
     return (
-      <div className="min-h-screen bg-white px-4 py-8 flex items-center justify-center">
+      <div className="min-h-screen bg-[#EFE6D8] px-4 py-8 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Please login</h2>
-          <p className="text-gray-500 mb-6">
-            Login to view and track your orders.
+          <h2 className="text-lg font-semibold text-[#3B2A1F] mb-1">
+            Please login
+          </h2>
+          <p className="text-xs text-[#6F4E37]/70">
+            Login to view and track your orders
           </p>
         </div>
       </div>
     );
   }
 
+  /* LOADING */
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8 flex items-center justify-center">
+      <div className="min-h-screen bg-[#EFE6D8] px-4 py-8 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading your orders...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#6F4E37] border-t-transparent mx-auto mb-3"></div>
+          <p className="text-xs text-[#6F4E37]/70">Loading your orders…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="px-4 py-4 sm:px-6 max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#EFE6D8] pb-24">
+      <div className="px-3 py-3 sm:px-5 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+        <div className="mb-3">
+          <h1 className="text-lg sm:text-xl font-semibold text-[#3B2A1F]">
             Your Orders
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs text-[#6F4E37]/70 mt-0.5">
             Track your current and past orders
           </p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-3 no-scrollbar">
           {[
             "All",
             "Pending Payment",
@@ -142,10 +146,10 @@ export default function Orders() {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition whitespace-nowrap ${
+              className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition whitespace-nowrap ${
                 filter === f
-                  ? "bg-orange-500 text-white shadow-md"
-                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  ? "bg-[#6F4E37] text-white shadow"
+                  : "bg-[#F6EFE6] text-[#6F4E37] border border-[#6F4E37]/30"
               }`}
             >
               {f}
@@ -154,188 +158,152 @@ export default function Orders() {
         </div>
 
         {/* Orders List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filtered.map((order) => (
             <div
               key={order._id}
-              className="rounded-2xl bg-white p-4 shadow-sm hover:shadow-md transition"
+              className="rounded-xl bg-[#F6EFE6] p-3 shadow-sm"
             >
-              {/* Mobile Layout */}
-              <div className="flex flex-col gap-3">
-                {/* Order Header */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-500 mb-1">
-                      Order ID
-                    </div>
-                    <div className="text-xs font-mono text-gray-700 break-all">
-                      {order._id}
-                    </div>
+              {/* Order Header */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-[#6F4E37]/60 mb-0.5">
+                    Order ID
                   </div>
-                  <div
-                    className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-semibold ${
-                      order.status === "Pending Payment"
-                        ? "bg-red-100 text-red-700"
-                        : order.status === "Paid"
-                        ? "bg-green-100 text-green-700"
+                  <div className="text-[11px] font-mono text-[#3B2A1F] break-all">
+                    {order._id}
+                  </div>
+                </div>
+
+                <div
+                  className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
+                    order.status === "Pending Payment"
+                      ? "bg-[#FDECEC] text-[#B23B3B]"
+                      : order.status === "Paid"
+                        ? "bg-[#E6F3EA] text-[#2E7D32]"
                         : order.status === "Preparing"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : order.status === "Ready"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    {order.status || "Pending Payment"}
-                  </div>
+                          ? "bg-[#FFF4E5] text-[#9C6A1B]"
+                          : order.status === "Ready"
+                            ? "bg-[#EEE8F6] text-[#5A3E85]"
+                            : "bg-[#E5D6C5] text-[#6F4E37]"
+                  }`}
+                >
+                  {order.status || "Pending Payment"}
                 </div>
+              </div>
 
-                {/* Date and Time */}
-                <div className="text-sm text-gray-500">
-                  {formatDate(order.createdAt)}
-                  {order.eta && (
-                    <span className="ml-2">• ETA {order.eta} min</span>
-                  )}
-                </div>
+              {/* Date / ETA */}
+              <div className="text-xs text-[#6F4E37]/70 mt-1">
+                {formatDate(order.createdAt)}
+                {order.eta && (
+                  <span className="ml-2">• ETA {order.eta} min</span>
+                )}
+              </div>
 
-                {/* Item Thumbnails */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                  {order.items.slice(0, 4).map((it, i) =>
-                    it.image ? (
-                      <img
-                        key={i}
-                        src={it.image}
-                        alt={it.name}
-                        className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div
-                        key={i}
-                        className="h-14 w-14 shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-xs"
-                      >
-                        No Img
-                      </div>
-                    )
-                  )}
-                  {order.items.length > 4 && (
-                    <div className="h-14 w-14 shrink-0 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-xs font-medium">
-                      +{order.items.length - 4}
+              {/* Item Thumbnails */}
+              <div className="flex items-center gap-2 overflow-x-auto mt-2 pb-1">
+                {order.items.slice(0, 4).map((it, i) =>
+                  it.image ? (
+                    <img
+                      key={i}
+                      src={it.image}
+                      alt={it.name}
+                      className="h-12 w-12 rounded-lg object-cover shrink-0"
+                    />
+                  ) : (
+                    <div
+                      key={i}
+                      className="h-12 w-12 rounded-lg bg-[#E5D6C5] flex items-center justify-center text-xs text-[#6F4E37]/60"
+                    >
+                      No Img
                     </div>
-                  )}
+                  ),
+                )}
+                {order.items.length > 4 && (
+                  <div className="h-12 w-12 rounded-lg bg-[#EDE1D2] flex items-center justify-center text-xs font-medium text-[#6F4E37]">
+                    +{order.items.length - 4}
+                  </div>
+                )}
+              </div>
+
+              {/* Total + Actions */}
+              <div className="flex items-center justify-between gap-3 pt-2 mt-2 border-t border-[#6F4E37]/20">
+                <div className="text-base font-semibold text-[#3B2A1F]">
+                  ₹{getTotal(order)}
                 </div>
 
-                {/* Total and Actions */}
-                <div className="flex items-center justify-between gap-3 pt-2 border-t">
-                  <div className="text-lg sm:text-xl font-bold text-gray-900">
-                    ₹{getTotal(order)}
-                  </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      setExpanded(expanded === order._id ? null : order._id)
+                    }
+                    className="rounded-full border border-[#6F4E37]/30 px-3 py-1 text-xs text-[#6F4E37] hover:bg-[#6F4E37]/10"
+                  >
+                    {expanded === order._id ? "Hide" : "Details"}
+                  </button>
 
-                  <div className="flex gap-2">
+                  {(order.status === "Paid" ||
+                    order.status === "Completed") && (
+                    <button
+                      onClick={() => setShowReceipt(order)}
+                      className="rounded-full bg-[#6F4E37] px-3 py-1 text-xs text-white hover:opacity-90"
+                    >
+                      Receipt
+                    </button>
+                  )}
+
+                  {order.status === "Pending Payment" && (
                     <button
                       onClick={() =>
-                        setExpanded(expanded === order._id ? null : order._id)
+                        navigate("/checkout", { state: { order } })
                       }
-                      className="rounded-lg border border-gray-300 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium hover:bg-gray-50 transition"
+                      className="rounded-full bg-[#6F4E37] px-3 py-1 text-xs text-white hover:opacity-90"
                     >
-                      {expanded === order._id ? "Hide" : "Details"}
+                      Pay Now
                     </button>
-
-                    {(order.status === "Paid" ||
-                      order.status === "Completed") && (
-                      <button
-                        onClick={() => setShowReceipt(order)}
-                        className="rounded-lg bg-blue-500 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-blue-600 transition"
-                      >
-                        Receipt
-                      </button>
-                    )}
-
-                    {order.status === "Pending Payment" && (
-                      <button
-                        onClick={() =>
-                          navigate("/checkout", { state: { order } })
-                        }
-                        className="rounded-lg bg-green-600 px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-green-700 transition"
-                      >
-                        Pay Now
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
 
               {/* Expanded Details */}
               {expanded === order._id && (
-                <div className="mt-4 border-t pt-4">
-                  <div className="space-y-3">
-                    {order.items.map((it, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        {it.image ? (
-                          <img
-                            src={it.image}
-                            alt={it.name}
-                            className="h-16 w-16 shrink-0 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <div className="h-16 w-16 shrink-0 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                            No Img
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 truncate">
-                            {it.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            Qty: {it.qty} × ₹{it.price}
-                          </div>
+                <div className="mt-3 pt-3 border-t border-[#6F4E37]/20 space-y-3">
+                  {order.items.map((it, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      {it.image ? (
+                        <img
+                          src={it.image}
+                          alt={it.name}
+                          className="h-14 w-14 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="h-14 w-14 rounded-lg bg-[#E5D6C5] flex items-center justify-center text-xs text-[#6F4E37]/60">
+                          No Img
                         </div>
-                        <div className="text-base font-semibold text-gray-900 shrink-0">
-                          ₹{it.price * it.qty}
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-[#3B2A1F] truncate">
+                          {it.name}
+                        </div>
+                        <div className="text-xs text-[#6F4E37]/70">
+                          Qty: {it.qty} × ₹{it.price}
                         </div>
                       </div>
-                    ))}
-
-                    <div className="flex items-center justify-between border-t pt-3 text-base">
-                      <div className="font-medium text-gray-700">Total</div>
-                      <div className="text-xl font-bold text-gray-900">
-                        ₹{getTotal(order)}
+                      <div className="text-sm font-semibold text-[#3B2A1F]">
+                        ₹{it.price * it.qty}
                       </div>
                     </div>
-
-                    {(order.status === "Paid" ||
-                      order.status === "Completed") && (
-                      <div className="mt-4 flex justify-center">
-                        <button
-                          onClick={() => setShowReceipt(order)}
-                          className="w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-medium transition"
-                        >
-                          View Receipt
-                        </button>
-                      </div>
-                    )}
-
-                    {order.status === "Pending Payment" && (
-                      <div className="mt-4 flex justify-center">
-                        <button
-                          onClick={() =>
-                            navigate("/checkout", { state: { order } })
-                          }
-                          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 font-medium transition"
-                        >
-                          Complete Payment
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
           ))}
 
           {filtered.length === 0 && (
-            <div className="text-center text-gray-500 py-12">
-              <div className="text-4xl mb-3">📦</div>
-              <p className="text-lg font-medium mb-1">No orders found</p>
-              <p className="text-sm">
+            <div className="text-center text-[#6F4E37]/70 py-12">
+              <div className="text-3xl mb-2">📦</div>
+              <p className="text-sm font-medium">No orders found</p>
+              <p className="text-xs mt-1">
                 {filter === "All"
                   ? "You haven't placed any orders yet"
                   : `No ${filter.toLowerCase()} orders`}

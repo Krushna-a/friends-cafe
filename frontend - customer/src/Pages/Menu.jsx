@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useSettings } from "../hooks/useSettings";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
@@ -9,7 +10,8 @@ export default function Menu() {
   const [remoteMenu, setRemoteMenu] = useState({});
   const [active, setActive] = useState("");
 
-  const { addItem, cart, updateQty } = useCart(); // tableNumber
+  const { addItem, cart, updateQty } = useCart();
+  const { settings } = useSettings();
   const sectionRefs = useRef({});
 
   const categories = Object.keys(remoteMenu);
@@ -60,7 +62,8 @@ export default function Menu() {
     const section = sectionRefs.current[category];
     if (!section) return;
 
-    const yOffset = -160;
+    // Account for sticky header height (approximately 140px)
+    const yOffset = -140;
     const y =
       section.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({ top: y, behavior: "smooth" });
@@ -74,7 +77,8 @@ export default function Menu() {
         if (!section) continue;
 
         const rect = section.getBoundingClientRect();
-        if (rect.top <= 180 && rect.bottom >= 180) {
+        // Account for sticky header height (approximately 140px)
+        if (rect.top <= 160 && rect.bottom >= 160) {
           setActive(cat);
           break;
         }
@@ -86,174 +90,200 @@ export default function Menu() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-500">Loading menu...</div>
+      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+        <div className="text-amber-800">Loading menu...</div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 px-4 py-3 sm:px-6 max-w-7xl mx-auto">
-      {/* Table Number Indicator
-      {tableNumber && (
-        <div className="mb-4 bg-orange-100 border border-orange-200 rounded-lg p-3">
-          <div className="flex items-center justify-center">
-            <div className="flex items-center gap-2">
-              <span className="text-orange-800 font-medium">
-                🪑 Table {tableNumber}
-              </span>
-              <span className="text-orange-600 text-sm">
-                • Ordering for this table
-              </span>
-            </div>
+ return (
+    <div className="min-h-screen bg-orange-50">
+      {/* Search Bar */}
+      <div className="px-3 py-2 bg-white sticky top-12 z-10">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+            <svg
+              className="h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
           </div>
-        </div>
-      )} */}
-
-      {/* Sticky Search + Category Bar */}
-      <div className="sticky top-0 z-5 bg-white border-b">
-        {/* Search */}
-        <div className="p-3">
           <input
             placeholder="Search item"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border px-4 py-2 text-sm sm:text-lg shadow-sm outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full pl-8 pr-3 py-2 text-sm bg-gray-100 rounded-full text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
           />
         </div>
+      </div>
 
-        {/* Categories */}
-        <div className="flex gap-4 overflow-x-auto px-3 pb-3 no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => scrollToCategory(cat)}
-              className={`flex flex-col items-center shrink-0 ${
-                active === cat ? "text-orange-500" : "text-gray-600"
-              }`}
-            >
+      {/* Main Layout */}
+      <div className="flex">
+        {/* Left Sidebar */}
+        <div className="w-20 sm:w-24 bg-white border-r border-gray-200 sticky top-[52px] h-[calc(100vh-52px)] overflow-y-auto">
+          <div className="p-1 space-y-1">
+            {categories.map((cat) => {
+              const isActive = active === cat;
+              const categoryItems = menuSource[cat] || [];
+              const firstItemImage = categoryItems[0]?.image;
+
+              return (
+                <button
+                  key={cat}
+                  onClick={() => scrollToCategory(cat)}
+                  className={`w-full p-1 rounded-lg transition-all ${
+                    isActive
+                      ? "bg-amber-800 text-white shadow"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  <div className="w-10 h-10 mx-auto mb-0.5 rounded-md overflow-hidden bg-gray-200">
+                    {firstItemImage ? (
+                      <img
+                        src={firstItemImage}
+                        alt={cat}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                        🍽️
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-[13px] font-medium leading-tight">
+                    {cat}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Content */}
+        <div className="flex-1 px-3 pb-24">
+          {categories.map((cat) => {
+            const filteredItems = (menuSource[cat] || []).filter((item) =>
+              item.name.toLowerCase().includes(search.toLowerCase()),
+            );
+
+            if (search && filteredItems.length === 0) return null;
+
+            return (
               <div
-                className={`h-14 w-14 rounded-xl overflow-hidden border ${
-                  active === cat ? "border-orange-500" : "border-gray-200"
-                }`}
+                key={cat}
+                ref={(el) => (sectionRefs.current[cat] = el)}
+                className="mb-4"
               >
-                <img
-                  src={
-                    menuSource[cat]?.[0]?.image ||
-                    "https://via.placeholder.com/60"
-                  }
-                  alt={cat}
-                  className="h-full w-full object-cover"
-                />
+                {/* Category Header */}
+                <div className="flex items-center gap-1 mb-2 mt-4">
+                  <h2 className="text-sm font-semibold text-amber-900">
+                    {cat} ({filteredItems.length})
+                  </h2>
+                </div>
+
+                {/* Items */}
+                <div className="space-y-2">
+                  {filteredItems.map((item) => {
+                    const cartItem = cart.find(
+                      (c) => c.name === item.name,
+                    );
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="bg-white rounded-xl p-3 shadow-sm border border-orange-100"
+                      >
+                        <div className="flex items-center justify-between">
+                          {/* Info */}
+                          <div className="flex-1 pr-2">
+                            <h3 className="text-sm font-semibold text-gray-900 leading-tight">
+                              {item.name}
+                            </h3>
+                            <p className="text-sm font-bold text-amber-800">
+                              {settings.currencySymbol} {item.price}
+                            </p>
+                          </div>
+
+                          {/* Image + Controls */}
+                          <div className="relative">
+                            <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xl">
+                                  🍽️
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="absolute -bottom-1 -right-1">
+                              {cartItem ? (
+                                <div className="flex items-center bg-amber-800 text-white rounded-full shadow">
+                                  <button
+                                    onClick={() =>
+                                      updateQty(
+                                        cartItem.name,
+                                        cartItem.qty - 1,
+                                      )
+                                    }
+                                    className="w-7 h-7 flex items-center justify-center rounded-full text-sm"
+                                  >
+                                    −
+                                  </button>
+                                  <span className="px-2 text-sm font-semibold min-w-[1.5rem] text-center">
+                                    {cartItem.qty}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      updateQty(
+                                        cartItem.name,
+                                        cartItem.qty + 1,
+                                      )
+                                    }
+                                    className="w-7 h-7 flex items-center justify-center rounded-full text-sm"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() =>
+                                    addItem({
+                                      name: item.name,
+                                      price: item.price,
+                                      image: item.image,
+                                      qty: 1,
+                                    })
+                                  }
+                                  className="w-7 h-7 bg-amber-800 text-white rounded-full flex items-center justify-center shadow text-sm"
+                                >
+                                  +
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <span className="mt-1 text-xs sm:text-sm font-medium whitespace-nowrap">
-                {cat}
-              </span>
-            </button>
-          ))}
+            );
+          })}
         </div>
       </div>
-
-      {/* Menu Sections */}
-      <div className="px-3 py-4 space-y-12">
-        {categories.map((cat) => {
-          const filteredItems = (menuSource[cat] || []).filter((item) =>
-            item.name.toLowerCase().includes(search.toLowerCase())
-          );
-
-          if (search && filteredItems.length === 0) return null;
-
-          return (
-            <div key={cat} ref={(el) => (sectionRefs.current[cat] = el)}>
-              {/* Category Title */}
-              <h2 className="mb-3 text-base sm:text-lg font-semibold text-gray-900">
-                {cat} ({filteredItems.length})
-              </h2>
-
-              {/* Items */}
-              <div className="divide-y">
-                {filteredItems.map((item) => {
-                  const cartItem = cart.find((c) => c.name === item.name);
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between py-4"
-                    >
-                      {/* Left Info */}
-                      <div className="flex-1 pr-3">
-                        <p className="text-sm sm:text-lg font-semibold text-gray-900">
-                          {item.name}
-                        </p>
-                        <p className="text-sm sm:text-lg text-gray-700 mt-1">
-                          ₹ {item.price}.00
-                        </p>
-                      </div>
-
-                      {/* Right Image + Action */}
-                      <div className="relative flex flex-col items-center">
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="h-20 w-20 rounded-xl object-cover"
-                          />
-                        ) : (
-                          <div className="h-20 w-20 rounded-xl bg-gray-200 flex items-center justify-center text-gray-400 text-sm">
-                            No Image
-                          </div>
-                        )}
-
-                        {/* Cart Controls */}
-                        {cartItem ? (
-                          <div className="absolute -bottom-3 flex items-center gap-2 bg-white rounded-lg border px-2 py-1 shadow">
-                            <button
-                              onClick={() =>
-                                updateQty(cartItem.name, cartItem.qty - 1)
-                              }
-                              className="px-2 text-sm sm:text-lg font-bold"
-                            >
-                              –
-                            </button>
-                            <div className="px-2 text-sm sm:text-lg font-semibold">
-                              {cartItem.qty}
-                            </div>
-                            <button
-                              onClick={() =>
-                                updateQty(cartItem.name, cartItem.qty + 1)
-                              }
-                              className="px-2 text-sm sm:text-lg font-bold"
-                            >
-                              +
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() =>
-                              addItem({
-                                name: item.name,
-                                price: item.price,
-                                image: item.image,
-                                qty: 1,
-                              })
-                            }
-                            className="absolute -bottom-3 rounded-lg border border-orange-500 bg-white px-3 py-1 text-xs sm:text-sm font-semibold text-orange-500 shadow-sm hover:bg-orange-50 transition"
-                          >
-                            + Add
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Bottom Spacing for Cart Bar */}
-      <div className="h-24" />
     </div>
   );
 }

@@ -34,88 +34,100 @@ export default function CartModal({ open, onClose }) {
     }
   };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4"
-      onClick={handleBackdropClick}
-    >
-      <div className="w-full max-w-3xl rounded-t-3xl bg-white p-5">
-        <div className="flex justify-between">
-          <div>
-            <h3 className="text-lg sm:text-xl font-semibold">Your Cart</h3>
-            <div className="text-sm sm:text-base text-gray-500">
-              {cart.length} items
-            </div>
+return (
+  <div
+    className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-1"
+    onClick={handleBackdropClick}
+  >
+    {/* Bottom Sheet */}
+    <div className="w-full max-w-3xl rounded-t-3xl bg-[#EFE6D8] p-3 shadow-2xl">
+      
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg sm:text-xl font-semibold text-[#3B2A1F]">
+            Your Cart
+          </h3>
+          <div className="text-sm text-[#6F4E37]/70">
+            {cart.length} items
           </div>
-          <button
-            onClick={onClose}
-            className="text-sm sm:text-base text-gray-600"
-          >
-            Close
-          </button>
         </div>
+        <button
+          onClick={onClose}
+          className="text-sm text-[#6F4E37] hover:underline"
+        >
+          Close
+        </button>
+      </div>
 
-        <div className="mt-4 space-y-4 max-h-[55vh] overflow-auto">
-          {cart.map((it, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 rounded-xl border p-3"
-            >
-              {/* Product Image */}
-              <div className="flex-shrink-0">
-                {it.image ? (
-                  <img
-                    src={it.image}
-                    alt={it.name}
-                    className="h-16 w-16 rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="h-16 w-16 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                    No Image
-                  </div>
-                )}
-              </div>
-
-              {/* Product Info */}
-              <div className="flex-1">
-                <div className="text-sm sm:text-lg font-medium">{it.name}</div>
-                <div className="text-sm sm:text-base text-gray-500">
-                  ₹ {it.price}.00
+      {/* Cart Items */}
+      <div className="mt-2 space-y-4 max-h-[55vh] overflow-auto">
+        {cart.map((it, idx) => (
+          <div
+            key={idx}
+            className="flex items-center justify-between rounded-2xl bg-[#F6EFE6] p-1 shadow-sm"
+          >
+            {/* Image */}
+            <div className="flex-shrink-0">
+              {it.image ? (
+                <img
+                  src={it.image}
+                  alt={it.name}
+                  className="h-16 w-16 rounded-xl object-cover"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-xl bg-[#E5D6C5] flex items-center justify-center text-xs text-[#6F4E37]/60">
+                  No Image
                 </div>
-              </div>
+              )}
+            </div>
 
-              {/* Quantity Controls */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => updateQty(it.name, it.qty - 1)}
-                  className="px-2 sm:px-3 py-1 border rounded-lg text-sm sm:text-lg"
-                >
-                  –
-                </button>
-                <div className="text-sm sm:text-lg font-semibold">{it.qty}</div>
-                <button
-                  onClick={() => updateQty(it.name, it.qty + 1)}
-                  className="px-2 sm:px-3 py-1 border rounded-lg text-sm sm:text-lg"
-                >
-                  +
-                </button>
+            {/* Name & Price */}
+            <div className="flex-1 pl-2">
+              <div className="text-sm sm:text-base font-medium text-[#3B2A1F]">
+                {it.name}
+              </div>
+              <div className="text-sm text-[#6F4E37]/70">
+                ₹ {it.price}.00
               </div>
             </div>
-          ))}
-        </div>
 
-        <div className="mt-4 border-t pt-4 flex justify-between items-center">
-          <div className="text-base sm:text-lg font-semibold">
-            Total: ₹ {cartTotal}.00
+            {/* Quantity Controls */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => updateQty(it.name, it.qty - 1)}
+                className="h-8 w-8 rounded-full border border-[#6F4E37]/30 text-[#6F4E37] text-lg hover:bg-[#6F4E37]/10"
+              >
+                –
+              </button>
+              <div className="w-6 text-center font-semibold text-[#3B2A1F]">
+                {it.qty}
+              </div>
+              <button
+                onClick={() => updateQty(it.name, it.qty + 1)}
+                className="h-8 w-8 rounded-full border border-[#6F4E37]/30 text-[#6F4E37] text-lg hover:bg-[#6F4E37]/10"
+              >
+                +
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handlePayNow}
-            className="rounded-lg bg-green-600 px-4 sm:px-6 py-2 text-white font-semibold text-sm sm:text-base hover:bg-green-700 transition"
-          >
-            Pay Now
-          </button>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-2 pt-2 flex justify-between items-center border-t border-[#6F4E37]/20">
+        <div className="text-base sm:text-lg font-semibold text-[#3B2A1F]">
+          Total: ₹ {cartTotal}.00
         </div>
+        <button
+          onClick={handlePayNow}
+          className="rounded-full bg-[#6F4E37] px-6 py-1 text-white font-semibold text-sm sm:text-base shadow-md hover:opacity-90 transition"
+        >
+          Pay Now
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

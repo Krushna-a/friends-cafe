@@ -9,61 +9,65 @@ const Navbar = () => {
   const { user, setShowAuth, logout } = useUser();
 
   return (
-    <header className="z-50 bg-white/95 backdrop-blur border-b shadow-sm">
-      <div className="flex items-center justify-between px-4 py-3 sm:px-6 max-w-7xl mx-auto">
-        {/* Brand Section */}
+    <header className="sticky top-0 z-50 bg-[#EFE6D8]/95 backdrop-blur border-b border-[#6F4E37]/20">
+      <div className="flex items-center justify-between px-3 py-2 sm:px-5 max-w-7xl mx-auto">
+        
+        {/* Brand */}
         <Link
           to="/"
-          className="flex items-center gap-3 hover:opacity-80 transition"
+          className="flex items-center gap-2 hover:opacity-90 transition"
         >
           <img
             src={logo}
             alt="Cafe Logo"
-            className="h-10 w-10 rounded-md object-contain"
+            className="h-8 w-8 rounded-md object-contain"
           />
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold text-gray-900 tracking-wide">
+            <span className="text-sm font-semibold text-[#3B2A1F]">
               Friends Café
             </span>
-            <span className="text-xs text-gray-500">Scan • Order • Enjoy</span>
+            <span className="text-[11px] text-[#6F4E37]/70">
+              Scan • Order • Enjoy
+            </span>
           </div>
         </Link>
 
-        {/* Actions */}
+        {/* Right Actions */}
         <div className="flex items-center gap-2">
-          {/* Table Number */}
+          
+          {/* Table */}
           {tableNumber && (
-            <div className="hidden sm:flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
+            <div className="hidden sm:flex items-center gap-1 rounded-full bg-[#6F4E37]/10 px-3 py-1 text-xs font-semibold text-[#6F4E37]">
               <span>Table</span>
-              <span className="text-sm font-bold">{tableNumber}</span>
+              <span className="font-bold">{tableNumber}</span>
             </div>
           )}
 
           {/* Cart */}
           <Link
             to="/orders"
-            className="relative flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 active:scale-95"
+            className="relative flex items-center gap-1.5 rounded-full bg-[#6F4E37] px-3 py-1.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:opacity-90 active:scale-95 transition"
           >
             <span>🛒</span>
             <span className="hidden sm:inline">Cart</span>
 
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-bold text-white">
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#3B2A1F] text-[10px] font-bold text-white">
                 {cartCount}
               </span>
             )}
           </Link>
 
-          {/* User / Login */}
+          {/* User */}
           {user ? (
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-1.5">
+              <div className="hidden sm:flex items-center gap-1 rounded-full bg-[#F6EFE6] px-3 py-1 text-xs font-medium text-[#3B2A1F]">
                 <span>👤</span>
                 <span>{user.name}</span>
               </div>
               <button
                 onClick={logout}
-                className="rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 transition"
+                className="rounded-full border border-[#6F4E37]/30 bg-transparent px-3 py-1 text-xs font-semibold text-[#6F4E37] hover:bg-[#6F4E37]/10 transition"
               >
                 Logout
               </button>
@@ -71,7 +75,7 @@ const Navbar = () => {
           ) : (
             <button
               onClick={() => setShowAuth(true)}
-              className="rounded-full border border-gray-300 px-4 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition"
+              className="rounded-full border border-[#6F4E37]/30 px-3 py-1.5 text-xs sm:text-sm font-semibold text-[#6F4E37] hover:bg-[#6F4E37]/10 transition"
             >
               Login
             </button>
