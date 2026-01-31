@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Café Color Palette */
+:root {
+  --coffee-brown: #7A3E1D;      /* Primary brand color */
+  --dark-cocoa: #4B2A1A;       /* Headers */
+  --caramel-orange: #C66A2B;   /* Call-to-action buttons */
+  --soft-cream: #FAF6F2;       /* Background */
+  --beige: #F1E6D8;            /* Secondary background */
+  --clean-white: #FFFFFF;      /* Cards */
+  --dark-espresso: #2B1B12;    /* Primary text */
+  --muted-brown: #6B4F3F;      /* Secondary text */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom café color classes */
+.bg-coffee-brown { background-color: var(--coffee-brown); }
+.bg-dark-cocoa { background-color: var(--dark-cocoa); }
+.bg-caramel-orange { background-color: var(--caramel-orange); }
+.bg-soft-cream { background-color: var(--soft-cream); }
+.bg-beige { background-color: var(--beige); }
+.bg-clean-white { background-color: var(--clean-white); }
+
+.text-coffee-brown { color: var(--coffee-brown); }
+.text-dark-cocoa { color: var(--dark-cocoa); }
+.text-caramel-orange { color: var(--caramel-orange); }
+.text-dark-espresso { color: var(--dark-espresso); }
+.text-muted-brown { color: var(--muted-brown); }
+
+.border-coffee-brown { border-color: var(--coffee-brown); }
+.border-dark-cocoa { border-color: var(--dark-cocoa); }
+.border-caramel-orange { border-color: var(--caramel-orange); }
+.border-muted-brown { border-color: var(--muted-brown); }
+
+/* Hover states */
+.hover\:bg-coffee-brown:hover { background-color: var(--coffee-brown); }
+.hover\:bg-dark-cocoa:hover { background-color: var(--dark-cocoa); }
+.hover\:bg-caramel-orange:hover { background-color: var(--caramel-orange); }
+
+/* Body background */
+body {
+  background-color: var(--soft-cream);
+  color: var(--dark-espresso);
+}
