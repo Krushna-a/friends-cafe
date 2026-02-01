@@ -197,7 +197,7 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
     <div className="w-full min-h-screen bg-soft-cream">
       {/* Header */}
       <div className="bg-gradient-to-r from-dark-cocoa via-coffee-brown to-dark-cocoa shadow-xl">
-        <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <div className=" bg-beige px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <button
@@ -218,11 +218,11 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
                   />
                 </svg>
               </button>
-              <div className="text-white">
+              <div className="text-cocoa">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   Select Table
                 </h1>
-                <p className="text-clean-white/80 text-sm mt-1 font-medium">
+                <p className="text-sm mt-1 font-medium">
                   Choose a table to start your café service
                 </p>
               </div>
@@ -230,7 +230,7 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
 
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-caramel-orange to-coffee-brown text-white text-sm font-semibold rounded-2xl hover:from-coffee-brown hover:to-dark-cocoa transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="inline-flex bg-orange-400 items-center gap-3 px-6 py-3 bg-gradient-to-r from-caramel-orange to-coffee-brown text-cocoa text-sm font-semibold rounded-2xl hover:from-coffee-brown hover:to-dark-cocoa transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <svg
                 className="w-5 h-5"
