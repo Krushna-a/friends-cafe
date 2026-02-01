@@ -6,7 +6,7 @@ A complete restaurant management system with customer ordering and staff managem
 
 - **Customer App**: [Coming Soon]
 - **Staff Dashboard**: [Coming Soon]
-- **API**: [Coming Soon]
+- **API**: [Coming Soon ]
 
 ## 📱 Features
 
