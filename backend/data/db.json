@@ -1,0 +1,87 @@
+{
+  "users": [
+    {
+      "id": "U-583560",
+      "mobile": "7020330661",
+      "name": "Krushna"
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Black Coffee",
+      "price": 99,
+      "category": "Hot",
+      "image": "Black_Coffee.png",
+      "description": "Strong and bold black coffee"
+    },
+    {
+      "id": "p2",
+      "name": "Cold Coffee",
+      "price": 149,
+      "category": "Cold",
+      "image": "Cold_Coffee_Plain.png",
+      "description": "Iced cold coffee"
+    },
+    {
+      "id": "p3",
+      "name": "Chocolate Crush Coffee",
+      "price": 179,
+      "category": "Cold",
+      "image": "Chocolate_Crush_Coffee.png",
+      "description": "Decadent chocolate coffee"
+    },
+    {
+      "id": "p4",
+      "name": "Thick Cold Coffee",
+      "price": 199,
+      "category": "Cold",
+      "image": "Thick_Cold_Coffee.png",
+      "description": "Creamy thick cold coffee"
+    },
+    {
+      "id": "p5",
+      "name": "Fries",
+      "price": 129,
+      "category": "Sides",
+      "image": "fries.png",
+      "description": "Crispy fries"
+    },
+    {
+      "id": "p6",
+      "name": "Cheese Fries",
+      "price": 169,
+      "category": "Sides",
+      "image": "Cheese_Fries.png",
+      "description": "Fries with melted cheese"
+    }
+  ],
+  "orders": [],
+  "otps": [
+    {
+      "mobile": "+919503676914",
+      "hash": "100195c3de679998ece86ce48a0aa18c901d141154f76c1b4f8cfcd9db28b098",
+      "expiresAt": "2026-01-08T14:23:43.606Z",
+      "name": "Omkar Kachgunde"
+    },
+    {
+      "mobile": "+917020330661",
+      "hash": "4d6bb4736dcd66a34abe5c4000541e1c50cec2c5b2a9f06c11f362970f9ca8ef",
+      "expiresAt": "2026-01-08T16:55:54.750Z",
+      "name": "Krushna"
+    },
+    {
+      "mobile": "+919503676913",
+      "hash": "5f56102821b32eb304b0bd75c1443d739e0dca14b1de81cd13cafd0665c2c3a4",
+      "expiresAt": "2026-01-08T16:56:53.895Z",
+      "name": "Omkar Kachgunde"
+    }
+  ],
+  "tables": [
+    {
+      "tableNumber": "1",
+      "qrUrl": "http://localhost:5173?table=1",
+      "isActive": true
+    }
+  ]
+}
