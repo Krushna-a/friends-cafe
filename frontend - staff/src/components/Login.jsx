@@ -82,6 +82,8 @@ const Login = ({ setIsAuthenticated }) => {
             />
           </div>
 
+          <div>test_username = admin & test_password = admin123</div>
+
           <button
             type="submit"
             disabled={loading}
