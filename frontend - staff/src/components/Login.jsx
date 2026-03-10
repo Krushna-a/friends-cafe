@@ -82,7 +82,14 @@ const Login = ({ setIsAuthenticated }) => {
             />
           </div>
 
-          <div>test_username = admin & test_password = admin123</div>
+          <div className="flex flex-col items-center">
+            <div>
+              test_username = admin
+            </div>
+            <div>
+              test_password = admin123
+            </div>
+          </div>
 
           <button
             type="submit"
