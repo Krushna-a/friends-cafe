@@ -182,18 +182,6 @@ const POSBilling = ({ selectedTable, onBack }) => {
         status: "paid",
       };
 
-      console.log("=== ORDER CREATION DEBUG ===");
-      console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
-      console.log("Token exists:", !!token);
-      console.log("Token preview:", token.substring(0, 20) + "...");
-      console.log("Order data:", JSON.stringify(orderData, null, 2));
-      console.log("Cart items:", cart);
-      console.log("Subtotal:", subtotal);
-      console.log("Selected table:", selectedTable);
-
-      // Test backend connectivity first
-      console.log("Testing backend connectivity...");
-
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/orders`,
         orderData,
@@ -205,9 +193,6 @@ const POSBilling = ({ selectedTable, onBack }) => {
           timeout: 10000, // 10 second timeout
         },
       );
-
-      console.log("Response status:", response.status);
-      console.log("Response data:", response.data);
 
       if (response.data.ok) {
         toast.success(`Bill printed successfully! Payment: ${paymentMethod}`);

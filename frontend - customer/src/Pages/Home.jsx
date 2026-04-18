@@ -14,7 +14,6 @@ const Home = () => {
 
     // If there's a table parameter, redirect to menu with the table parameter
     if (tableNumber) {
-      console.log(`QR Code scanned for table: ${tableNumber}`);
       navigate(`/menu?table=${tableNumber}`, { replace: true });
     }
   }, [location.search, navigate]);

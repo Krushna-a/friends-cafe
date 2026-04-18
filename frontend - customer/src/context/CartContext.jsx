@@ -27,7 +27,6 @@ export function CartProvider({ children }) {
     try {
       return localStorage.getItem("fcc_table") || null;
     } catch (e) {
-      console.log(e.message);
       return null;
     }
   });
@@ -154,38 +153,22 @@ export function CartProvider({ children }) {
   }, [user]);
 
   const placeOrder = async ({ items = cart, paid = false, paymentId } = {}) => {
-    console.log("placeOrder called with:", {
-      itemsCount: items?.length,
-      paid,
-      paymentId,
-      items: items,
-    });
-
-    if (!items || items.length === 0) {
-      console.log("No items to place order");
-      return null;
-    }
+    if (!items || items.length === 0) return null;
 
     const token = localStorage.getItem("fcc_token");
-    console.log("Token exists:", !!token);
 
     if (token) {
       try {
-        // First verify the token is still valid
-        console.log("Verifying token...");
         const authCheck = await fetch(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!authCheck.ok) {
-          console.log("Token verification failed");
-          // Token is invalid, remove it and throw error
           localStorage.removeItem("fcc_token");
           localStorage.removeItem("fcc_user");
           throw new Error("Your session has expired. Please log in again.");
         }
 
-        console.log("Token verified, creating order...");
         const r = await fetch(`${API_BASE}/api/orders`, {
           method: "POST",
           headers: {
@@ -195,41 +178,25 @@ export function CartProvider({ children }) {
           body: JSON.stringify({ items, paid, tableNumber }),
         });
 
-        console.log("Order creation response status:", r.status);
         const j = await r.json();
-        console.log("Order creation response:", j);
+        if (!r.ok) throw new Error(j.error || "Failed to place order");
 
-        if (!r.ok) {
-          throw new Error(j.error || "Failed to place order");
-        }
-
-        console.log("Order created successfully:", j.order);
-
-        // Order successfully created on backend
-        // ALWAYS refresh orders from database to ensure sync
-        console.log("Refreshing orders from database...");
         const refreshRes = await fetch(`${API_BASE}/api/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const refreshData = await refreshRes.json();
         if (refreshRes.ok) {
-          // Use fresh data from database
-          console.log("Orders refreshed successfully");
           setOrders(refreshData.orders || []);
         } else {
-          // If refresh fails, at least add the new order we just created
-          console.log("Orders refresh failed, adding new order locally");
           setOrders((prev) => [j.order, ...prev]);
         }
         clearCart();
         return j.order;
       } catch (e) {
         console.error("Failed to place order on backend:", e);
-        // Don't fallback to local - throw error so user knows
         throw new Error("Failed to place order. Please try again.");
       }
     } else {
-      console.error("No authentication token found");
       throw new Error(
         "You must be logged in to place an order. Please log in and try again.",
       );

@@ -6,7 +6,6 @@ const { Readable } = require("stream");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 const adapter = require("../utils/adapter");
-const { readDB, writeDB } = require("../utils/db");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const Table = require("../models/Table");
@@ -60,43 +59,7 @@ function adminAuthMiddleware(req, res, next) {
 // Public Settings (no auth required)
 router.get("/public/settings", async (req, res) => {
   try {
-    let settings;
-
-    if (adapter.usingMongo() && Settings) {
-      settings = await Settings.getSettings();
-      settings = settings.toObject();
-    } else {
-      // File-based fallback
-      const db = await readDB();
-      settings = db.settings || {
-        cafeName: "Friends Cafe",
-        cafeTagline: "Coffee & More",
-        logo: "",
-        address: {
-          street: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: "India",
-        },
-        phone: "",
-        email: "",
-        website: "",
-        currency: "INR",
-        currencySymbol: "₹",
-        timezone: "Asia/Kolkata",
-        socialMedia: {
-          facebook: "",
-          instagram: "",
-          twitter: "",
-          whatsapp: "",
-        },
-        primaryColor: "#059669",
-        secondaryColor: "#0891b2",
-      };
-    }
-
-    // Only return public settings (exclude sensitive data)
+    const settings = (await Settings.getSettings()).toObject();
     const publicSettings = {
       cafeName: settings.cafeName,
       cafeTagline: settings.cafeTagline,
@@ -114,7 +77,6 @@ router.get("/public/settings", async (req, res) => {
       primaryColor: settings.primaryColor,
       secondaryColor: settings.secondaryColor,
     };
-
     return res.json({ ok: true, settings: publicSettings });
   } catch (error) {
     console.error("Get public settings error:", error);
@@ -200,16 +162,7 @@ router.post(
       };
 
       let product;
-      if (adapter.usingMongo() && Product) {
-        product = await Product.create(productData);
-        product = product.toObject();
-      } else {
-        const db = await readDB();
-        db.products = db.products || [];
-        db.products.push(productData);
-        await writeDB(db);
-        product = productData;
-      }
+      product = (await Product.create(productData)).toObject();
 
       return res.json({ ok: true, product });
     } catch (error) {
@@ -218,6 +171,21 @@ router.post(
     }
   },
 );
+
+// Get Single Product (admin)
+router.get("/products/:id", adminAuthMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(404).json({ error: "Product not found" });
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+    return res.json({ ok: true, product: product.toObject() });
+  } catch (error) {
+    console.error("Get product error:", error);
+    return res.status(500).json({ error: "Failed to fetch product" });
+  }
+});
 
 // Update Product
 router.put(
@@ -240,18 +208,10 @@ router.put(
       } = req.body;
 
       let product;
-      if (adapter.usingMongo() && Product) {
-        product = await Product.findById(id);
-        if (!product) {
-          return res.status(404).json({ error: "Product not found" });
-        }
-      } else {
-        const db = await readDB();
-        product = db.products.find((p) => p.id === id);
-        if (!product) {
-          return res.status(404).json({ error: "Product not found" });
-        }
-      }
+      if (!mongoose.Types.ObjectId.isValid(id))
+        return res.status(404).json({ error: "Product not found" });
+      product = await Product.findById(id);
+      if (!product) return res.status(404).json({ error: "Product not found" });
 
       // Upload new image if provided
       if (req.file) {
@@ -294,19 +254,8 @@ router.put(
             : tags
           : [];
 
-      if (adapter.usingMongo() && Product) {
-        await product.save();
-        product = product.toObject();
-      } else {
-        const db = await readDB();
-        const idx = db.products.findIndex((p) => p.id === id);
-        if (idx !== -1) {
-          db.products[idx] = product;
-          await writeDB(db);
-        }
-      }
-
-      return res.json({ ok: true, product });
+      await product.save();
+      return res.json({ ok: true, product: product.toObject() });
     } catch (error) {
       console.error("Update product error:", error);
       return res.status(500).json({ error: "Failed to update product" });
@@ -319,20 +268,10 @@ router.delete("/products/:id", adminAuthMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (adapter.usingMongo() && Product) {
-      const product = await Product.findByIdAndDelete(id);
-      if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-    } else {
-      const db = await readDB();
-      const idx = db.products.findIndex((p) => p.id === id);
-      if (idx === -1) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-      db.products.splice(idx, 1);
-      await writeDB(db);
-    }
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(404).json({ error: "Product not found" });
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
     return res.json({ ok: true, message: "Product deleted" });
   } catch (error) {
@@ -346,8 +285,6 @@ router.delete("/products/:id", adminAuthMiddleware, async (req, res) => {
 // Create POS Order (Staff creates order for customer)
 router.post("/pos/orders", adminAuthMiddleware, async (req, res) => {
   try {
-    console.log("Received POS order request:", req.body);
-
     const {
       customOrderId,
       customerName,
@@ -378,19 +315,15 @@ router.post("/pos/orders", adminAuthMiddleware, async (req, res) => {
 
     // Validation
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.log("Validation failed: Items are required");
       return res.status(400).json({ error: "Items are required" });
     }
 
     if (!tableNumber) {
-      console.log("Validation failed: Table number is required");
       return res.status(400).json({ error: "Table number is required" });
     }
 
-    // For POS orders, don't require customer name
     const isPosOrder = orderType === "pos";
     if (!isPosOrder && !customerName) {
-      console.log("Validation failed: Customer name is required");
       return res.status(400).json({ error: "Customer name is required" });
     }
 
@@ -485,45 +418,19 @@ router.post("/pos/orders", adminAuthMiddleware, async (req, res) => {
           : undefined,
     };
 
-    console.log("Creating order with validated data");
-
-    let order;
-    if (adapter.usingMongo() && Order) {
-      console.log("Using MongoDB to create order");
-      order = await Order.create(orderData);
-      order = order.toObject();
-      console.log("MongoDB order created successfully:", order._id);
-    } else {
-      console.log("Using file-based DB to create order");
-      const db = await readDB();
-      db.orders = db.orders || [];
-      orderData.id = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      orderData.createdAt = new Date();
-      db.orders.push(orderData);
-      await writeDB(db);
-      order = orderData;
-      console.log("File-based order created:", order.id);
-    }
-
-    console.log(
-      `POS Order created: ${order._id || order.id} for table: ${tableNumber}${isPosOrder ? " (POS)" : `, customer: ${customerName}`}, total: ₹${calculatedFinalAmount}`,
-    );
+    const order = (await Order.create(orderData)).toObject();
     return res.json({ ok: true, order });
   } catch (error) {
     console.error("Error creating POS order:", error);
-    console.error("Error stack:", error.stack);
-    return res.status(500).json({
-      error: "Failed to create POS order",
-      details: error.message,
-    });
+    return res
+      .status(500)
+      .json({ error: "Failed to create POS order", details: error.message });
   }
 });
 
 // Create General Order (for both POS and regular orders)
 router.post("/orders", adminAuthMiddleware, async (req, res) => {
   try {
-    console.log("Received order creation request:", req.body);
-
     const {
       items,
       total,
@@ -537,12 +444,10 @@ router.post("/orders", adminAuthMiddleware, async (req, res) => {
 
     // Validation
     if (!items || !Array.isArray(items) || items.length === 0) {
-      console.log("Validation failed: Items are required");
       return res.status(400).json({ error: "Items are required" });
     }
 
     if (!total || total <= 0) {
-      console.log("Validation failed: Valid total is required");
       return res.status(400).json({ error: "Valid total is required" });
     }
 
@@ -604,114 +509,36 @@ router.post("/orders", adminAuthMiddleware, async (req, res) => {
       createdAt: new Date(),
     };
 
-    console.log("Creating order with data:", orderData);
-
-    let order;
-    if (adapter.usingMongo() && Order) {
-      console.log("Using MongoDB to create order");
-      order = await Order.create(orderData);
-      order = order.toObject();
-      console.log("MongoDB order created successfully:", order._id);
-    } else {
-      console.log("Using file-based DB to create order");
-      const db = await readDB();
-      db.orders = db.orders || [];
-      orderData.id = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      db.orders.push(orderData);
-      await writeDB(db);
-      order = orderData;
-      console.log("File-based order created:", order.id);
-    }
-
-    console.log(
-      `Order created: ${order._id || order.id} for table: ${tableNumber || "N/A"}, payment: ${paymentMethod}, total: ₹${total}`,
-    );
+    const order = (await Order.create(orderData)).toObject();
     return res.json({ ok: true, order });
   } catch (error) {
     console.error("Error creating order:", error);
-    console.error("Error stack:", error.stack);
-    console.error("Error name:", error.name);
-    console.error("Error message:", error.message);
-
-    // Log more details about the error
-    if (error.name === "ValidationError") {
-      console.error("Validation errors:", error.errors);
-    }
-    if (error.name === "MongoError" || error.name === "MongoServerError") {
-      console.error("MongoDB error code:", error.code);
-    }
-
-    return res.status(500).json({
-      error: "Failed to create order",
-      details: error.message,
-      type: error.name,
-    });
+    return res
+      .status(500)
+      .json({ error: "Failed to create order", details: error.message });
   }
 });
 
 // Get All Orders
 router.get("/orders", adminAuthMiddleware, async (req, res) => {
   try {
-    let orders;
     const User = require("../models/User");
+    const orders = (await Order.find().sort({ createdAt: -1 })).map((o) =>
+      o.toObject(),
+    );
 
-    if (adapter.usingMongo() && Order) {
-      orders = await Order.find().sort({ createdAt: -1 });
-      orders = orders.map((o) => o.toObject());
-
-      // Populate user info
-      if (User && adapter.usingMongo()) {
-        for (const order of orders) {
-          // Try to find user by id field or _id
-          let user = await User.findOne({ id: order.userId });
-          if (!user && order.userId) {
-            // Try as MongoDB _id
-            try {
-              user = await User.findById(order.userId);
-            } catch (e) {
-              // Not a valid ObjectId, try mobile
-              user = await User.findOne({ mobile: order.userId });
-            }
-          }
-          if (user) {
-            order.userName = user.name || user.mobile || "Unknown";
-            order.userMobile = user.mobile;
-          } else {
-            order.userName = order.userId || "Unknown";
-            order.userMobile = "";
-          }
-        }
-      } else {
-        // File-based: get user info from db
-        const db = await readDB();
-        const users = db.users || [];
-        for (const order of orders) {
-          const user = users.find((u) => u.id === order.userId);
-          if (user) {
-            order.userName = user.name || user.mobile || "Unknown";
-            order.userMobile = user.mobile;
-          } else {
-            order.userName = order.userId || "Unknown";
-            order.userMobile = "";
-          }
-        }
+    for (const order of orders) {
+      let user = null;
+      if (order.userId) {
+        try {
+          user = await User.findById(order.userId);
+        } catch {}
+        if (!user) user = await User.findOne({ mobile: order.userId });
       }
-    } else {
-      const db = await readDB();
-      orders = db.orders || [];
-      const users = db.users || [];
-
-      // Populate user info
-      for (const order of orders) {
-        const user = users.find((u) => u.id === order.userId);
-        if (user) {
-          order.userName = user.name || user.mobile || "Unknown";
-          order.userMobile = user.mobile;
-        } else {
-          order.userName = order.userId || "Unknown";
-          order.userMobile = "";
-        }
-      }
+      order.userName = user
+        ? user.name || user.mobile || "Unknown"
+        : order.customerName || "Unknown";
+      order.userMobile = user ? user.mobile : "";
     }
 
     return res.json({ ok: true, orders });
@@ -731,27 +558,11 @@ router.patch("/orders/:id/status", adminAuthMiddleware, async (req, res) => {
       return res.status(400).json({ error: "Status is required" });
     }
 
-    let order;
-    if (adapter.usingMongo() && Order) {
-      order = await Order.findById(id);
-      if (!order) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      order.status = status;
-      await order.save();
-      order = order.toObject();
-    } else {
-      const db = await readDB();
-      const idx = db.orders.findIndex((o) => o.id === id);
-      if (idx === -1) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      db.orders[idx].status = status;
-      await writeDB(db);
-      order = db.orders[idx];
-    }
-
-    return res.json({ ok: true, order });
+    let order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    order.status = status;
+    await order.save();
+    return res.json({ ok: true, order: order.toObject() });
   } catch (error) {
     console.error("Update order status error:", error);
     return res.status(500).json({ error: "Failed to update order status" });
@@ -762,65 +573,21 @@ router.patch("/orders/:id/status", adminAuthMiddleware, async (req, res) => {
 router.get("/users", adminAuthMiddleware, async (req, res) => {
   try {
     const User = require("../models/User");
-    let users;
+    const users = (await User.find().sort({ createdAt: -1 })).map((u) =>
+      u.toObject(),
+    );
 
-    if (adapter.usingMongo() && User) {
-      users = await User.find().sort({ createdAt: -1 });
-      users = users.map((u) => u.toObject());
-
-      // Get orders for each user (exclude POS orders)
-      if (Order && adapter.usingMongo()) {
-        for (const user of users) {
-          try {
-            // Use the MongoDB ObjectId (_id) for querying orders by customerId
-            const userId = user._id;
-            const userOrders = await Order.find({
-              customerId: userId,
-              $or: [
-                { isPosOrder: { $ne: true } },
-                { orderType: { $ne: "pos" } },
-              ],
-            }).sort({
-              createdAt: -1,
-            });
-            user.orders = userOrders.map((o) => o.toObject());
-            user.orderCount = userOrders.length;
-          } catch (orderError) {
-            console.error(
-              `Error fetching orders for user ${user._id}:`,
-              orderError.message,
-            );
-            // If there's an error fetching orders, set empty arrays
-            user.orders = [];
-            user.orderCount = 0;
-          }
-        }
-      } else {
-        const db = await readDB();
-        const orders = db.orders || [];
-        for (const user of users) {
-          const userOrders = orders.filter(
-            (o) =>
-              o.customerId === (user.id || user._id) &&
-              !o.isPosOrder &&
-              o.orderType !== "pos",
-          );
-          user.orders = userOrders;
-          user.orderCount = userOrders.length;
-        }
-      }
-    } else {
-      const db = await readDB();
-      users = db.users || [];
-      const orders = db.orders || [];
-
-      // Get orders for each user (exclude POS orders)
-      for (const user of users) {
-        const userOrders = orders.filter(
-          (o) => o.customerId === user.id && !o.isPosOrder && o.orderType !== "pos",
-        );
-        user.orders = userOrders;
+    for (const user of users) {
+      try {
+        const userOrders = await Order.find({
+          customerId: user._id,
+          $or: [{ isPosOrder: { $ne: true } }, { orderType: { $ne: "pos" } }],
+        }).sort({ createdAt: -1 });
+        user.orders = userOrders.map((o) => o.toObject());
         user.orderCount = userOrders.length;
+      } catch {
+        user.orders = [];
+        user.orderCount = 0;
       }
     }
 
@@ -862,32 +629,10 @@ router.get("/stats", adminAuthMiddleware, async (req, res) => {
 
     let orders, products, users;
 
-    if (adapter.usingMongo() && Order) {
-      // Get orders in the period
-      // Filter orders after fetching to handle both Date and string formats
-      const allOrders = await Order.find();
-      orders = allOrders
-        .map((o) => o.toObject())
-        .filter((o) => {
-          if (!o.createdAt) return false;
-          try {
-            const orderDate = new Date(o.createdAt);
-            return !isNaN(orderDate.getTime()) && orderDate >= startDate;
-          } catch {
-            return false;
-          }
-        });
-
-      // Get all products for item stats
-      products = await Product.find();
-      products = products.map((p) => p.toObject());
-
-      // Get all users
-      users = await User.find();
-      users = users.map((u) => u.toObject());
-    } else {
-      const db = await readDB();
-      orders = (db.orders || []).filter((o) => {
+    const allOrders = await Order.find();
+    orders = allOrders
+      .map((o) => o.toObject())
+      .filter((o) => {
         if (!o.createdAt) return false;
         try {
           const orderDate = new Date(o.createdAt);
@@ -896,9 +641,8 @@ router.get("/stats", adminAuthMiddleware, async (req, res) => {
           return false;
         }
       });
-      products = db.products || [];
-      users = db.users || [];
-    }
+    products = (await Product.find()).map((p) => p.toObject());
+    users = (await User.find()).map((u) => u.toObject());
 
     // Calculate statistics
     const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
@@ -1039,23 +783,9 @@ router.get("/stats", adminAuthMiddleware, async (req, res) => {
 // Get All Areas
 router.get("/areas", adminAuthMiddleware, async (req, res) => {
   try {
-    let areas;
-
-    if (adapter.usingMongo() && Area) {
-      areas = await Area.find({ isActive: true }).sort({
-        sortOrder: 1,
-        name: 1,
-      });
-      areas = areas.map((a) => a.toObject());
-    } else {
-      // Fallback for file-based storage
-      areas = [
-        { _id: "ground", name: "Ground Floor", code: "GF" },
-        { _id: "basement", name: "Basement", code: "BM" },
-        { _id: "party", name: "Party Hall", code: "PH" },
-      ];
-    }
-
+    const areas = (
+      await Area.find({ isActive: true }).sort({ sortOrder: 1, name: 1 })
+    ).map((a) => a.toObject());
     return res.json({ ok: true, areas });
   } catch (error) {
     console.error("Get areas error:", error);
@@ -1068,16 +798,9 @@ router.get("/areas", adminAuthMiddleware, async (req, res) => {
 // Get All Tables
 router.get("/tables", adminAuthMiddleware, async (req, res) => {
   try {
-    let tables;
-
-    if (adapter.usingMongo() && Table) {
-      tables = await Table.find().sort({ tableNumber: 1 });
-      tables = tables.map((t) => t.toObject());
-    } else {
-      const db = await readDB();
-      tables = db.tables || [];
-    }
-
+    const tables = (await Table.find().sort({ tableNumber: 1 })).map((t) =>
+      t.toObject(),
+    );
     return res.json({ ok: true, tables });
   } catch (error) {
     console.error("Get tables error:", error);
@@ -1105,30 +828,13 @@ router.post("/tables", adminAuthMiddleware, async (req, res) => {
     };
 
     let table;
-    if (adapter.usingMongo() && Table) {
-      // Check if table number already exists
-      const existing = await Table.findOne({
-        tableNumber: tableData.tableNumber,
-      });
-      if (existing) {
-        return res.status(400).json({ error: "Table number already exists" });
-      }
-      table = await Table.create(tableData);
-      table = table.toObject();
-    } else {
-      const db = await readDB();
-      db.tables = db.tables || [];
-      // Check if table number already exists
-      const existing = db.tables.find(
-        (t) => t.tableNumber === tableData.tableNumber,
-      );
-      if (existing) {
-        return res.status(400).json({ error: "Table number already exists" });
-      }
-      db.tables.push(tableData);
-      await writeDB(db);
-      table = tableData;
-    }
+    // Check if table number already exists
+    const existing = await Table.findOne({
+      tableNumber: tableData.tableNumber,
+    });
+    if (existing)
+      return res.status(400).json({ error: "Table number already exists" });
+    table = (await Table.create(tableData)).toObject();
 
     return res.json({ ok: true, table });
   } catch (error) {
@@ -1142,20 +848,8 @@ router.delete("/tables/:id", adminAuthMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (adapter.usingMongo() && Table) {
-      const table = await Table.findByIdAndDelete(id);
-      if (!table) {
-        return res.status(404).json({ error: "Table not found" });
-      }
-    } else {
-      const db = await readDB();
-      const idx = db.tables.findIndex((t) => t.id === id);
-      if (idx === -1) {
-        return res.status(404).json({ error: "Table not found" });
-      }
-      db.tables.splice(idx, 1);
-      await writeDB(db);
-    }
+    const table = await Table.findByIdAndDelete(id);
+    if (!table) return res.status(404).json({ error: "Table not found" });
 
     return res.json({ ok: true, message: "Table deleted" });
   } catch (error) {
@@ -1171,12 +865,7 @@ router.get("/tables/:id/qr", adminAuthMiddleware, async (req, res) => {
     const QRCode = require("qrcode");
 
     let table;
-    if (adapter.usingMongo() && Table) {
-      table = await Table.findById(id);
-    } else {
-      const db = await readDB();
-      table = db.tables.find((t) => t.id === id);
-    }
+    table = await Table.findById(id);
 
     if (!table) {
       return res.status(404).json({ error: "Table not found" });
@@ -1191,12 +880,10 @@ router.get("/tables/:id/qr", adminAuthMiddleware, async (req, res) => {
       margin: 2,
     });
 
-    // Update table with QR code data if using MongoDB
-    if (adapter.usingMongo() && Table) {
-      table.qrCode = qrCodeDataUrl;
-      table.qrUrl = qrUrl;
-      await table.save();
-    }
+    // Update table with QR code data
+    table.qrCode = qrCodeDataUrl;
+    table.qrUrl = qrUrl;
+    await table.save();
 
     return res.json({ ok: true, qrCode: qrCodeDataUrl, qrUrl, table });
   } catch (error) {
@@ -1210,55 +897,7 @@ router.get("/tables/:id/qr", adminAuthMiddleware, async (req, res) => {
 // Get Settings
 router.get("/settings", adminAuthMiddleware, async (req, res) => {
   try {
-    let settings;
-
-    if (adapter.usingMongo() && Settings) {
-      settings = await Settings.getSettings();
-      settings = settings.toObject();
-    } else {
-      // File-based fallback
-      const db = await readDB();
-      settings = db.settings || {
-        cafeName: "Friends Cafe",
-        cafeTagline: "Coffee & More",
-        logo: "",
-        address: {
-          street: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: "India",
-        },
-        phone: "",
-        email: "",
-        website: "",
-        gstNumber: "",
-        fssaiNumber: "",
-        currency: "INR",
-        currencySymbol: "₹",
-        timezone: "Asia/Kolkata",
-        defaultTaxRate: 18,
-        serviceChargeRate: 0,
-        receiptHeader: "",
-        receiptFooter: "Thank you for your business!\nVisit us again soon",
-        printLogo: true,
-        autoKotPrint: false,
-        autoBillPrint: false,
-        roundOffBills: true,
-        lowStockAlert: true,
-        lowStockThreshold: 10,
-        orderNotifications: true,
-        socialMedia: {
-          facebook: "",
-          instagram: "",
-          twitter: "",
-          whatsapp: "",
-        },
-        primaryColor: "#059669",
-        secondaryColor: "#0891b2",
-      };
-    }
-
+    const settings = (await Settings.getSettings()).toObject();
     return res.json({ ok: true, settings });
   } catch (error) {
     console.error("Get settings error:", error);
@@ -1303,21 +942,10 @@ router.put(
         }
       }
 
-      let settings;
-      if (adapter.usingMongo() && Settings) {
-        settings = await Settings.getSettings();
-        Object.assign(settings, updateData);
-        await settings.save();
-        settings = settings.toObject();
-      } else {
-        // File-based fallback
-        const db = await readDB();
-        db.settings = { ...db.settings, ...updateData };
-        await writeDB(db);
-        settings = db.settings;
-      }
-
-      return res.json({ ok: true, settings });
+      let settings = await Settings.getSettings();
+      Object.assign(settings, updateData);
+      await settings.save();
+      return res.json({ ok: true, settings: settings.toObject() });
     } catch (error) {
       console.error("Update settings error:", error);
       return res.status(500).json({ error: "Failed to update settings" });

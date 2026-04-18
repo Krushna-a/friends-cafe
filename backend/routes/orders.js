@@ -1,6 +1,5 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const { readDB, writeDB } = require("../utils/db");
 
 const router = express.Router();
 
@@ -19,33 +18,19 @@ function authMiddleware(req, res, next) {
 
 router.post("/", authMiddleware, async (req, res) => {
   const { items, paid, tableNumber } = req.body || {};
-  console.log("Order creation request received:", {
-    userId: req.user.id,
-    itemsCount: items?.length || 0,
-    paid,
-    tableNumber,
-    items: items,
-  });
 
   if (!items || !Array.isArray(items) || items.length === 0) {
-    console.log("Invalid items provided:", items);
     return res.status(400).json({ error: "items required" });
   }
 
   try {
     const adapter = require("../utils/adapter");
-    console.log("Calling adapter.createOrder...");
     const order = await adapter.createOrder({
       userId: req.user.id,
       items,
       paid,
       tableNumber,
     });
-    console.log(
-      `Order created: ${order._id || order.id} for user: ${
-        req.user.id
-      }, table: ${tableNumber || "N/A"}, status: ${order.status}`,
-    );
     return res.json({ ok: true, order });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -54,10 +39,8 @@ router.post("/", authMiddleware, async (req, res) => {
 });
 
 router.get("/", authMiddleware, async (req, res) => {
-  console.log("GET /orders called for user:", req.user.id);
   const adapter = require("../utils/adapter");
   const orders = await adapter.getOrdersByUser(req.user.id);
-  console.log("Returning orders:", orders.length);
   return res.json({ ok: true, orders });
 });
 
@@ -100,7 +83,7 @@ router.patch("/:id/pay", authMiddleware, async (req, res) => {
         return res.status(400).json({ error: "Invalid payment signature" });
       }
     } else {
-      console.log("Mock payment detected, skipping signature verification");
+      // mock payment — no signature verification needed
     }
 
     const adapter = require("../utils/adapter");

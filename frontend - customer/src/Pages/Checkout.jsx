@@ -78,12 +78,8 @@ export default function Checkout() {
   };
 
   const handlePay = async () => {
-    console.log("Payment initiated...");
-
-    // Check authentication state
     const token = localStorage.getItem("fcc_token");
     if (!user || !token) {
-      console.log("User not authenticated, showing login");
       setShowAuth(true);
       return;
     }
@@ -94,21 +90,14 @@ export default function Checkout() {
     }
 
     try {
-      console.log("Creating payment order...");
       const r = await fetch(`${API_BASE}/api/pay/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: total, // Razorpay expects paise
-          provider: "upi",
-        }),
+        body: JSON.stringify({ amount: total, provider: "upi" }),
       });
 
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || "Payment initiation failed");
-
-      console.log("Payment order created, opening Razorpay...");
-      console.log("Payment response:", j);
 
       const options = {
         key: j.key,
@@ -117,21 +106,13 @@ export default function Checkout() {
         name: "Smart Café",
         description: "Payment for your order",
         order_id: j.orderId,
-        prefill: {
-          contact: user.mobile || "",
-          name: user.name || "",
-        },
+        prefill: { contact: user.mobile || "", name: user.name || "" },
         theme: { color: "#f97316" },
 
         handler: async function (response) {
           try {
-            console.log("Payment successful, processing order...");
-            console.log("Payment response:", response);
-
-            // Check if user is still logged in before processing
             const token = localStorage.getItem("fcc_token");
             if (!token || !user) {
-              console.error("User not authenticated during payment processing");
               toast.error("Authentication expired. Please log in again.");
               setShowAuth(true);
               setPaid(false);
@@ -139,15 +120,12 @@ export default function Checkout() {
             }
 
             if (isIncoming) {
-              console.log("Processing existing order payment...");
               await payOrder(incomingOrder._id, {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               });
             } else {
-              console.log("Creating new order...");
-              console.log("Cart items:", cart);
               await placeOrder({
                 items: cart,
                 paid: true,
@@ -155,15 +133,12 @@ export default function Checkout() {
               });
             }
 
-            console.log("Order processed successfully, navigating...");
             toast.success("Payment successful!");
             setPaid(false);
             navigate("/orders", { replace: true });
           } catch (e) {
             console.error("Order processing error:", e);
             setPaid(false);
-
-            // Check if it's an authentication error
             if (
               e.message.includes("logged in") ||
               e.message.includes("token")
@@ -178,13 +153,10 @@ export default function Checkout() {
           }
         },
 
-        modal: {
-          ondismiss: () => setPaid(false),
-        },
+        modal: { ondismiss: () => setPaid(false) },
       };
 
       const razor = new window.Razorpay(options);
-
       razor.on("payment.failed", function (response) {
         console.error("Payment failed:", response);
         setPaid(false);
@@ -204,7 +176,9 @@ export default function Checkout() {
     return (
       <div className="min-h-screen px-4 py-8 bg-soft-cream flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2 text-dark-cocoa">Please login to pay</h2>
+          <h2 className="text-xl font-semibold mb-2 text-dark-cocoa">
+            Please login to pay
+          </h2>
           <p className="text-muted-brown">
             We opened the login window. Complete login to continue checkout.
           </p>
@@ -287,7 +261,9 @@ export default function Checkout() {
                 >
                   –
                 </button>
-                <div className="px-2 text-sm font-semibold text-dark-espresso">{it.qty}</div>
+                <div className="px-2 text-sm font-semibold text-dark-espresso">
+                  {it.qty}
+                </div>
                 <button
                   onClick={() => changeQty(idx, +1)}
                   className="px-2 font-semibold text-coffee-brown"

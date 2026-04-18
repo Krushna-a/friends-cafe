@@ -351,8 +351,10 @@ const Edit = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem("adminToken");
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/products/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/admin/products/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         if (response.data.ok && response.data.product) {
           const product = response.data.product;
@@ -429,7 +431,7 @@ const Edit = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.ok) {

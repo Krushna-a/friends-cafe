@@ -79,9 +79,6 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
         from: twilioFrom,
         to: mobile,
       });
-      console.log(
-        `OTP sent successfully via Twilio SMS. SID: ${message.sid}, To: ${mobile}`
-      );
       resp.message = "OTP sent via SMS";
     } catch (e) {
       console.error("Twilio SMS send failed:", {
@@ -111,8 +108,8 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
 
     console.warn(
       `Twilio credentials missing: ${missingVars.join(
-        ", "
-      )}. OTP will not be sent via SMS.`
+        ", ",
+      )}. OTP will not be sent via SMS.`,
     );
 
     // DEV fallback only
@@ -124,7 +121,7 @@ router.post("/send-otp", sendLimiter, async (req, res) => {
     } else {
       // In production, we should not silently fail
       console.error(
-        "ERROR: Twilio credentials missing in production mode. OTP cannot be sent!"
+        "ERROR: Twilio credentials missing in production mode. OTP cannot be sent!",
       );
       return res.status(500).json({
         error: "SMS service not configured. Please contact support.",
@@ -169,7 +166,7 @@ router.post("/verify", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, mobile: user.mobile },
       process.env.JWT_SECRET || "devsecret",
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.json({ ok: true, user, token });
@@ -209,15 +206,7 @@ router.post("/check-user", async (req, res) => {
 
   try {
     const User = require("../models/User");
-    let user = null;
-
-    if (adapter.usingMongo() && User) {
-      user = await User.findOne({ mobile });
-    } else {
-      const { readDB } = require("../utils/db");
-      const db = await readDB();
-      user = (db.users || []).find((u) => u.mobile === mobile);
-    }
+    let user = await User.findOne({ mobile });
 
     if (user) {
       return res.json({
@@ -227,7 +216,6 @@ router.post("/check-user", async (req, res) => {
         mobile: user.mobile,
       });
     }
-
     return res.json({ ok: true, exists: false });
   } catch (e) {
     console.error("Check user error", e);

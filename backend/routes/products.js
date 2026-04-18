@@ -1,5 +1,4 @@
 const express = require("express");
-const { readDB } = require("../utils/db");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -11,9 +10,13 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   const adapter = require("../utils/adapter");
-  const p = await adapter.getProductById(id);
-  if (!p) return res.status(404).json({ error: "Not found" });
-  return res.json({ ok: true, product: p });
+  try {
+    const p = await adapter.getProductById(id);
+    if (!p) return res.status(404).json({ error: "Not found" });
+    return res.json({ ok: true, product: p });
+  } catch (e) {
+    return res.status(404).json({ error: "Not found" });
+  }
 });
 
 module.exports = router;

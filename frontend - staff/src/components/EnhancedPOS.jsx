@@ -201,9 +201,6 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
   const total = complimentary ? 0 : subtotal + taxAmount - discountAmount;
 
   const printKOT = () => {
-    // Mock KOT printing
-    console.log("Printing KOT for Table:", selectedTable.tableNumber);
-    console.log("Items:", cart);
     setKotPrinted(true);
     toast.success("KOT sent to kitchen");
   };
@@ -259,7 +256,7 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
         const payload = JSON.parse(atob(token.split(".")[1]));
         adminUserId = payload.id || "staff";
       } catch (e) {
-        console.log("Could not decode token, using default admin ID");
+        // use default
       }
 
       const customOrderId = `ORD-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
@@ -334,8 +331,6 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
         confirmedAt: new Date(),
         paidAt: getTotalPaid() >= total ? new Date() : undefined,
       };
-
-      console.log("Sending enhanced POS order data:", orderData);
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/pos/orders`,
