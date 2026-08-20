@@ -1,188 +1,196 @@
-# FCC Restaurant Management System
+# Friends Cafe - Restaurant Management System
 
-A complete restaurant management system with customer ordering and staff management.
+A full-stack restaurant management solution with separate customer ordering interface and staff dashboard for seamless restaurant operations.
 
-## 🚀 Live Demo
+## Live Demo
 
-- **Customer App**: [Coming Soon]
-- **Staff Dashboard**: [Coming Soon]
-- **API**: [Coming Soon ]
+- **Customer App**: https://friends-cafe-v5m2.vercel.app
+- **Staff Dashboard**: https://friends-cafe-seven.vercel.app
+- **Backend API**: https://friends-cafe.onrender.com
 
-## 📱 Features
+## Overview
 
-### Customer Features
-- 📱 Mobile-first responsive design
-- 🍽️ Browse menu with categories
-- 🛒 Shopping cart with quantity management
-- 📱 OTP-based authentication
-- 💳 Razorpay payment integration
-- 📄 Digital receipts and invoices
-- 📋 Order history and tracking
-- 🏷️ QR code table ordering
+This is a production-ready restaurant management system built to handle customer orders, payments, table management, and staff operations. The application features two separate interfaces:
 
-### Staff Features
-- 👨‍💼 Admin dashboard
-- 📊 Order management and status updates
-- 👥 Customer management
-- 🏷️ Table management with QR codes
-- 📈 Sales analytics and reporting
-- 🖨️ Receipt printing
-- 📱 Real-time order notifications
+1. **Customer App** - Mobile-responsive ordering interface with QR code table access
+2. **Staff Dashboard** - Complete POS system with order management and analytics
 
-### Technical Features
-- 🔐 JWT authentication
-- 📱 SMS OTP verification (Twilio)
-- ☁️ Cloud image storage (Cloudinary)
-- 🗄️ MongoDB database
-- 🌐 RESTful API
-- 📱 Progressive Web App (PWA) ready
-- 🔒 Secure payment processing
-- 📍 Indian timezone support
+## Key Features
 
-## 🛠️ Tech Stack
+**Customer Experience**
+- Browse menu with category filtering
+- Add items to cart with real-time total calculation
+- Secure OTP-based login
+- Online payment via Razorpay
+- View order history and digital receipts
+- QR code-based table ordering
 
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT
-- **SMS**: Twilio (OTP delivery)
-- **Payments**: Razorpay
-- **Storage**: Cloudinary
-- **QR Codes**: qrcode library
+**Staff Operations**
+- Complete POS system for order management
+- Real-time order status tracking
+- Customer and order history management
+- Table management with QR code generation
+- Sales analytics and revenue reports
+- Product inventory management
 
-### Frontend
-- **Framework**: React 19
-- **Build Tool**: Vite (Rolldown)
-- **Styling**: Tailwind CSS 4
-- **Routing**: React Router v7
-- **State Management**: Context API
-- **HTTP Client**: Axios (staff), Fetch (customer)
-- **Icons**: Lucide React, FontAwesome
-- **Notifications**: React Toastify
+## Tech Stack
 
-## 📁 Project Structure
+**Backend**
+- Node.js & Express.js - RESTful API
+- MongoDB - Database with Mongoose ODM
+- JWT - Authentication & authorization
+- Razorpay - Payment gateway integration
+- Cloudinary - Image storage
+- Twilio - SMS notifications (optional)
+
+**Frontend**
+- React 19 - UI library
+- Vite - Build tool
+- Tailwind CSS 4 - Styling
+- React Router v7 - Client-side routing
+- Axios - HTTP client
+- Context API - State management
+
+**Deployment**
+- Vercel - Frontend hosting
+- Render - Backend hosting
+- MongoDB Atlas - Cloud database
+
+## Project Structure
 
 ```
-├── backend/                 # Node.js API server
-│   ├── models/             # MongoDB schemas
-│   ├── routes/             # API routes
-│   ├── utils/              # Utility functions
-│   ├── data/               # Seed data
-│   └── server.js           # Entry point
-├── frontend - customer/     # Customer React app
-│   ├── src/
-│   │   ├── Components/     # Reusable components
-│   │   ├── Pages/          # Page components
-│   │   └── context/        # Context providers
-├── frontend - staff/        # Staff dashboard React app
-│   ├── src/
-│   │   ├── components/     # Reusable components
-│   │   └── pages/          # Page components
-└── docs/                   # Documentation
+friends-cafe/
+├── backend/
+│   ├── models/          # Database schemas
+│   ├── routes/          # API endpoints
+│   ├── utils/           # Helper functions
+│   └── server.js        # Express server
+│
+├── frontend - customer/
+│   └── src/
+│       ├── Components/  # UI components
+│       ├── Pages/       # Page views
+│       └── context/     # State management
+│
+└── frontend - staff/
+    └── src/
+        ├── components/  # UI components
+        └── pages/       # Dashboard views
 ```
 
-## 🚀 Quick Start
+## Setup Instructions
 
 ### Prerequisites
-- Node.js 18+
+
+- Node.js (v18 or higher)
 - MongoDB Atlas account
-- Razorpay account
-- Twilio account (for SMS OTP)
-- Cloudinary account
+- Razorpay account (for payments)
+- Cloudinary account (for image uploads)
 
 ### Installation
 
-1. **Clone the repository**
+1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/fcc-restaurant.git
-cd fcc-restaurant
+git clone https://github.com/Krushna-a/friends-cafe.git
+cd friends-cafe
 ```
 
-2. **Setup Backend**
+2. Install backend dependencies
 ```bash
 cd backend
 npm install
-cp .env.example .env
-# Edit .env with your credentials
+```
+
+3. Create `.env` file in backend folder
+```env
+PORT=4000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+RAZORPAY_KEY_ID=your_razorpay_key
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+FRONTEND_URL=http://localhost:5173
+```
+
+4. Start backend server
+```bash
 npm start
 ```
 
-3. **Setup Customer Frontend**
+5. Install and run customer frontend (in new terminal)
 ```bash
 cd "frontend - customer"
 npm install
 npm run dev
 ```
 
-4. **Setup Staff Frontend**
+6. Install and run staff frontend (in new terminal)
 ```bash
 cd "frontend - staff"
 npm install
 npm run dev
 ```
 
-### Environment Variables
+The applications will be available at:
+- Customer App: http://localhost:5173
+- Staff Dashboard: http://localhost:5174
+- Backend API: http://localhost:4000
 
-See `.env.example` files in each directory for required environment variables.
+## Deployment
 
-## 🌐 Deployment
+The project is configured for deployment on:
+- **Vercel** for both frontends
+- **Render** for backend
+- **MongoDB Atlas** for database
 
-This project is configured for easy deployment on:
-- **Backend**: Railway
-- **Frontends**: Vercel
-- **Database**: MongoDB Atlas
+Update CORS origins in `backend/server.js` with your deployed URLs.
 
-Run the deployment script:
-```bash
-# Windows
-deploy.bat
+## Screenshots
 
-# Linux/Mac
-./deploy.sh
-```
+> Add screenshots of your application here to showcase the UI
 
-See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed deployment instructions.
+### Customer App
+- Home page
+- Menu browsing
+- Cart and checkout
+- Order history
 
-## 🔧 Configuration
+### Staff Dashboard
+- POS system
+- Order management
+- Analytics dashboard
+- Table management
 
-### Payment Gateway
-- Supports Razorpay for Indian payments
-- Test and live mode configuration
-- Automatic payment verification
+## API Endpoints
 
-### QR Code System
-- Dynamic QR code generation for tables
-- Automatic table detection
-- Mobile-optimized ordering flow
+**Authentication**
+- `POST /api/auth/login` - User login with OTP
+- `GET /api/auth/me` - Get current user
 
-### Time Zone
-- All times displayed in Indian Standard Time (IST)
-- Automatic timezone conversion
-- Consistent date formatting
+**Products**
+- `GET /api/products` - Get all products
+- `GET /api/products/:id` - Get product by ID
 
-## 🤝 Contributing
+**Orders**
+- `POST /api/orders` - Create new order
+- `GET /api/orders` - Get user orders
+- `PATCH /api/orders/:id/pay` - Mark order as paid
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+**Admin** (Staff only)
+- `GET /api/admin/orders` - Get all orders
+- `POST /api/admin/products` - Create product
+- `GET /api/admin/stats` - Get sales analytics
 
-## 📄 License
+## Contributing
 
-This project is licensed under the MIT License.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## 🆘 Support
+## License
 
-For support, please contact:
-- Email: support@yourrestaurant.com
+MIT
 
-## 🙏 Acknowledgments
+## Contact
 
-- React team for the amazing framework
-- Tailwind CSS for the utility-first CSS
-- Twilio for SMS OTP delivery
-- Razorpay for payment processing
-- MongoDB for the database
-- Vercel and Railway for hosting
+For questions or support, please open an issue on GitHub.
