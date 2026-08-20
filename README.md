@@ -8,6 +8,14 @@ A full-stack restaurant management solution with separate customer ordering inte
 - **Staff Dashboard**: https://friends-cafe-seven.vercel.app
 - **Backend API**: https://friends-cafe.onrender.com
 
+## Screenshots
+
+<img width="535" height="760" alt="image" src="https://github.com/user-attachments/assets/49c7f371-d2c7-4465-a61d-9b1617682283" />
+<img width="521" height="752" alt="image" src="https://github.com/user-attachments/assets/f060c986-6877-4862-b00e-23b7af72347e" />
+<img width="1901" height="863" alt="image" src="https://github.com/user-attachments/assets/989f5174-e606-417e-92db-d61a55798c62" />
+<img width="1902" height="867" alt="image" src="https://github.com/user-attachments/assets/21a8a8e0-e0e6-4c00-9a8b-374687949870" />
+<img width="1891" height="867" alt="image" src="https://github.com/user-attachments/assets/cff0842d-4316-411c-9694-a5b8f15dacb5" />
+
 ## Overview
 
 This is a production-ready restaurant management system built to handle customer orders, payments, table management, and staff operations. The application features two separate interfaces:
@@ -147,9 +155,6 @@ The project is configured for deployment on:
 
 Update CORS origins in `backend/server.js` with your deployed URLs.
 
-## Screenshots
-
-> Add screenshots of your application here to showcase the UI
 
 ### Customer App
 - Home page
