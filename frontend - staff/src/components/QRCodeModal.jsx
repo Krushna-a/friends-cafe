@@ -13,14 +13,8 @@ const QRCodeModal = ({ table, onClose }) => {
 
   const generateQRCode = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/tables/${table._id}/qr`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
       );
 
       if (response.data?.ok) {
@@ -103,10 +97,7 @@ const QRCodeModal = ({ table, onClose }) => {
           <h2 className="text-xl font-bold text-white">
             Table {table.tableNumber} QR Code
           </h2>
-          <button
-            onClick={onClose}
-            className="text-white/80 hover:text-white"
-          >
+          <button onClick={onClose} className="text-white/80 hover:text-white">
             ✕
           </button>
         </div>

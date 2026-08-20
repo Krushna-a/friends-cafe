@@ -44,13 +44,6 @@ const Add = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        toast.error("Please login first");
-        navigate("/");
-        return;
-      }
-
       if (!formData.image.file) {
         toast.error("Please upload an image");
         return;
@@ -66,12 +59,7 @@ const Add = () => {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/products`,
         formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.ok) {
@@ -88,8 +76,12 @@ const Add = () => {
     <div className="h-screen bg-soft-cream p-4 mt-2">
       <div className="h-full max-w-6xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-dark-cocoa">Add New Product</h2>
-          <p className="text-sm text-muted-brown mt-1">Create a new menu item for your café</p>
+          <h2 className="text-2xl font-bold text-dark-cocoa">
+            Add New Product
+          </h2>
+          <p className="text-sm text-muted-brown mt-1">
+            Create a new menu item for your café
+          </p>
         </div>
 
         <form
@@ -172,8 +164,18 @@ const Add = () => {
                 type="submit"
                 className="bg-caramel-orange text-white py-4 px-8 rounded-xl hover:bg-dark-cocoa transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
                 </svg>
                 ADD PRODUCT
               </button>
@@ -205,11 +207,25 @@ const Add = () => {
                   />
                 ) : (
                   <div className="text-center">
-                    <svg className="w-12 h-12 text-muted-brown mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <svg
+                      className="w-12 h-12 text-muted-brown mx-auto mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
                     </svg>
-                    <span className="text-muted-brown font-medium">Upload Image</span>
-                    <p className="text-xs text-muted-brown/70 mt-1">PNG, JPG up to 2MB</p>
+                    <span className="text-muted-brown font-medium">
+                      Upload Image
+                    </span>
+                    <p className="text-xs text-muted-brown/70 mt-1">
+                      PNG, JPG up to 2MB
+                    </p>
                   </div>
                 )}
               </label>

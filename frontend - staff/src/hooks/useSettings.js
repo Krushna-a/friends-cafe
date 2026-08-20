@@ -47,14 +47,8 @@ export const useSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/settings`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {

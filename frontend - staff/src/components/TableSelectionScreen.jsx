@@ -19,14 +19,8 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
 
   const fetchTables = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/tables`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {
@@ -43,14 +37,8 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
 
   const fetchActiveOrders = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/orders`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {
@@ -87,15 +75,9 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
 
     setCreating(true);
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/tables`,
         { tableNumber: newTableNumber.trim() },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {
@@ -118,14 +100,8 @@ const TableSelectionScreen = ({ onTableSelect, onBack }) => {
     }
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return;
-
       const response = await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/tables/${tableId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {

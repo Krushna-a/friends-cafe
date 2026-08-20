@@ -57,17 +57,8 @@ const Settings = () => {
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/");
-        return;
-      }
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/settings`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {
@@ -115,12 +106,6 @@ const Settings = () => {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/");
-        return;
-      }
-
       const formData = new FormData();
 
       // Add all settings data
@@ -140,12 +125,7 @@ const Settings = () => {
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/settings`,
         formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.ok) {
@@ -177,7 +157,9 @@ const Settings = () => {
       <div className="h-screen bg-soft-cream p-4 mt-2 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-4 border-coffee-brown/30 border-t-coffee-brown mx-auto mb-4"></div>
-          <div className="text-muted-brown font-medium">Loading settings...</div>
+          <div className="text-muted-brown font-medium">
+            Loading settings...
+          </div>
         </div>
       </div>
     );
@@ -187,9 +169,7 @@ const Settings = () => {
     <div className="h-screen bg-soft-cream p-4 mt-2 w-full overflow-y-auto">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-dark-cocoa mb-2">
-            Settings
-          </h1>
+          <h1 className="text-2xl font-bold text-dark-cocoa mb-2">Settings</h1>
           <p className="text-muted-brown">
             Manage your café settings and preferences
           </p>
@@ -239,7 +219,9 @@ const Settings = () => {
                             className="w-full h-full object-cover rounded-2xl"
                           />
                         ) : (
-                          <span className="text-muted-brown text-xs">No Logo</span>
+                          <span className="text-muted-brown text-xs">
+                            No Logo
+                          </span>
                         )}
                       </div>
                       <div>
@@ -955,8 +937,18 @@ const Settings = () => {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     Save Settings
                   </>

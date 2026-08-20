@@ -46,13 +46,8 @@ export default function Orders() {
 
   const fetchOrders = async () => {
     try {
-      if (!token) {
-        navigate("/");
-        return;
-      }
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/orders`,
-        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.data.ok) setOrders(res.data.orders || []);
     } catch {

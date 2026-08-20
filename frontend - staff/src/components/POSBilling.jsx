@@ -30,19 +30,8 @@ const POSBilling = ({ selectedTable, onBack }) => {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        onBack();
-        return;
-      }
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/products`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
       );
 
       if (response.data.ok) {
@@ -155,12 +144,6 @@ const POSBilling = ({ selectedTable, onBack }) => {
     }
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        toast.error("Authentication required");
-        return;
-      }
-
       // Calculate subtotal
       const subtotal = calculateSubtotal();
 
@@ -185,13 +168,7 @@ const POSBilling = ({ selectedTable, onBack }) => {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/orders`,
         orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          timeout: 10000, // 10 second timeout
-        },
+        { headers: { "Content-Type": "application/json" }, timeout: 10000 },
       );
 
       if (response.data.ok) {

@@ -54,12 +54,6 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/");
-        return;
-      }
-
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/products`,
       );
@@ -244,21 +238,6 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
     setProcessingOrder(true);
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/");
-        return;
-      }
-
-      // Get admin user info from token
-      let adminUserId = "staff";
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        adminUserId = payload.id || "staff";
-      } catch (e) {
-        // use default
-      }
-
       const customOrderId = `ORD-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
       const orderData = {
@@ -298,7 +277,7 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
                   value: discountValue,
                   amount: parseFloat(discountAmount.toFixed(2)),
                   reason: "Manual discount",
-                  appliedBy: adminUserId,
+                  appliedBy: "staff",
                 },
               ]
             : [],
@@ -324,7 +303,7 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
         kotPrinted: kotPrinted,
         kotPrintedAt: kotPrinted ? new Date() : undefined,
 
-        createdBy: adminUserId,
+        createdBy: "staff",
         notes: orderNotes,
 
         orderTime: new Date(),
@@ -335,9 +314,6 @@ const EnhancedPOS = ({ selectedTable, onBack }) => {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/pos/orders`,
         orderData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
 
       if (response.data.ok) {

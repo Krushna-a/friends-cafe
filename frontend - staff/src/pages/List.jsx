@@ -159,20 +159,9 @@ const List = () => {
     }
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        toast.error("Please login first");
-        navigate("/");
-        return;
-      }
-
       await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/products/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        
       );
 
       toast.success("Product deleted successfully");
@@ -307,3 +296,4 @@ const List = () => {
 };
 
 export default List;
+

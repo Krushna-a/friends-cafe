@@ -1,5 +1,4 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { Readable } = require("stream");
@@ -39,23 +38,6 @@ function uploadToCloudinary(buffer) {
   });
 }
 
-// Admin authentication middleware
-function adminAuthMiddleware(req, res, next) {
-  const auth = req.headers.authorization || "";
-  const token = auth.replace(/^Bearer\s*/, "");
-  if (!token) return res.status(401).json({ error: "Missing token" });
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || "devsecret");
-    if (payload.role !== "admin") {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-    req.admin = payload;
-    return next();
-  } catch (e) {
-    return res.status(401).json({ error: "Invalid token" });
-  }
-}
-
 // Public Settings (no auth required)
 router.get("/public/settings", async (req, res) => {
   try {
@@ -84,32 +66,13 @@ router.get("/public/settings", async (req, res) => {
   }
 });
 
-// Admin Login
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body || {};
-
-  // Simple admin credentials check (in production, use proper hashing and database)
-  const adminUsername = process.env.ADMIN_USERNAME || "admin";
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
-
-  if (username === adminUsername && password === adminPassword) {
-    const token = jwt.sign(
-      { id: "admin", username, role: "admin" },
-      process.env.JWT_SECRET || "devsecret",
-      { expiresIn: "7d" },
-    );
-    return res.json({ ok: true, token, user: { username, role: "admin" } });
-  }
-
-  return res.status(401).json({ error: "Invalid credentials" });
-});
+// Admin Login - removed, no auth required
 
 // Admin Product Routes
 
 // Create Product
 router.post(
   "/products",
-  adminAuthMiddleware,
   upload.single("image1"),
   async (req, res) => {
     try {
@@ -173,7 +136,7 @@ router.post(
 );
 
 // Get Single Product (admin)
-router.get("/products/:id", adminAuthMiddleware, async (req, res) => {
+router.get("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id))
@@ -190,7 +153,6 @@ router.get("/products/:id", adminAuthMiddleware, async (req, res) => {
 // Update Product
 router.put(
   "/products/:id",
-  adminAuthMiddleware,
   upload.single("image1"),
   async (req, res) => {
     try {
@@ -264,7 +226,7 @@ router.put(
 );
 
 // Delete Product
-router.delete("/products/:id", adminAuthMiddleware, async (req, res) => {
+router.delete("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -283,7 +245,7 @@ router.delete("/products/:id", adminAuthMiddleware, async (req, res) => {
 // Admin Order Routes
 
 // Create POS Order (Staff creates order for customer)
-router.post("/pos/orders", adminAuthMiddleware, async (req, res) => {
+router.post("/pos/orders", async (req, res) => {
   try {
     const {
       customOrderId,
@@ -429,7 +391,7 @@ router.post("/pos/orders", adminAuthMiddleware, async (req, res) => {
 });
 
 // Create General Order (for both POS and regular orders)
-router.post("/orders", adminAuthMiddleware, async (req, res) => {
+router.post("/orders", async (req, res) => {
   try {
     const {
       items,
@@ -520,7 +482,7 @@ router.post("/orders", adminAuthMiddleware, async (req, res) => {
 });
 
 // Get All Orders
-router.get("/orders", adminAuthMiddleware, async (req, res) => {
+router.get("/orders", async (req, res) => {
   try {
     const User = require("../models/User");
     const orders = (await Order.find().sort({ createdAt: -1 })).map((o) =>
@@ -549,7 +511,7 @@ router.get("/orders", adminAuthMiddleware, async (req, res) => {
 });
 
 // Update Order Status
-router.patch("/orders/:id/status", adminAuthMiddleware, async (req, res) => {
+router.patch("/orders/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -570,7 +532,7 @@ router.patch("/orders/:id/status", adminAuthMiddleware, async (req, res) => {
 });
 
 // Get All Users with their orders
-router.get("/users", adminAuthMiddleware, async (req, res) => {
+router.get("/users", async (req, res) => {
   try {
     const User = require("../models/User");
     const users = (await User.find().sort({ createdAt: -1 })).map((u) =>
@@ -599,7 +561,7 @@ router.get("/users", adminAuthMiddleware, async (req, res) => {
 });
 
 // Get Statistics
-router.get("/stats", adminAuthMiddleware, async (req, res) => {
+router.get("/stats", async (req, res) => {
   try {
     const { period = "month" } = req.query; // day, week, month, year
     const Order = require("../models/Order");
@@ -781,7 +743,7 @@ router.get("/stats", adminAuthMiddleware, async (req, res) => {
 // Admin Area & Table Routes
 
 // Get All Areas
-router.get("/areas", adminAuthMiddleware, async (req, res) => {
+router.get("/areas", async (req, res) => {
   try {
     const areas = (
       await Area.find({ isActive: true }).sort({ sortOrder: 1, name: 1 })
@@ -796,7 +758,7 @@ router.get("/areas", adminAuthMiddleware, async (req, res) => {
 // Admin Table Routes
 
 // Get All Tables
-router.get("/tables", adminAuthMiddleware, async (req, res) => {
+router.get("/tables", async (req, res) => {
   try {
     const tables = (await Table.find().sort({ tableNumber: 1 })).map((t) =>
       t.toObject(),
@@ -809,7 +771,7 @@ router.get("/tables", adminAuthMiddleware, async (req, res) => {
 });
 
 // Create Table
-router.post("/tables", adminAuthMiddleware, async (req, res) => {
+router.post("/tables", async (req, res) => {
   try {
     const { tableNumber } = req.body;
 
@@ -844,7 +806,7 @@ router.post("/tables", adminAuthMiddleware, async (req, res) => {
 });
 
 // Delete Table
-router.delete("/tables/:id", adminAuthMiddleware, async (req, res) => {
+router.delete("/tables/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -859,7 +821,7 @@ router.delete("/tables/:id", adminAuthMiddleware, async (req, res) => {
 });
 
 // Generate QR Code for Table
-router.get("/tables/:id/qr", adminAuthMiddleware, async (req, res) => {
+router.get("/tables/:id/qr", async (req, res) => {
   try {
     const { id } = req.params;
     const QRCode = require("qrcode");
@@ -895,7 +857,7 @@ router.get("/tables/:id/qr", adminAuthMiddleware, async (req, res) => {
 // Admin Settings Routes
 
 // Get Settings
-router.get("/settings", adminAuthMiddleware, async (req, res) => {
+router.get("/settings", async (req, res) => {
   try {
     const settings = (await Settings.getSettings()).toObject();
     return res.json({ ok: true, settings });
@@ -908,7 +870,6 @@ router.get("/settings", adminAuthMiddleware, async (req, res) => {
 // Update Settings
 router.put(
   "/settings",
-  adminAuthMiddleware,
   upload.single("logo"),
   async (req, res) => {
     try {
@@ -954,3 +915,4 @@ router.put(
 );
 
 module.exports = router;
+

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Add from "./pages/Add";
@@ -10,27 +9,17 @@ import POS from "./pages/POS";
 import Settings from "./pages/Settings";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Login from "./components/Login";
 import Edit from "./pages/Edit";
 import { FullScreenProvider, useFullScreen } from "./context/FullScreenContext";
 
-// Main App Layout Component
-const AppLayout = ({ setIsAuthenticated }) => {
+const AppLayout = () => {
   const { isFullScreen } = useFullScreen();
 
   return (
     <>
-      {/* Hide navbar in full screen mode */}
-      {!isFullScreen && <Navbar setIsAuthenticated={setIsAuthenticated} />}
-
+      {!isFullScreen && <Navbar />}
       <div className="w-full flex">
-        {/* Hide sidebar in full screen mode */}
-        {!isFullScreen && (
-          <div className="">
-            <Sidebar />
-          </div>
-        )}
-
+        {!isFullScreen && <Sidebar />}
         <div
           className={`${isFullScreen ? "w-full" : "w-full flex justify-center"}`}
         >
@@ -43,56 +32,19 @@ const AppLayout = ({ setIsAuthenticated }) => {
             <Route path="/pos" element={<POS />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/edit/:id" element={<Edit />} />
+            <Route path="/" element={<Navigate to="/list" replace />} />
           </Routes>
         </div>
       </div>
-
-      {/* Hide footer in full screen mode */}
       {!isFullScreen && <Footer />}
     </>
   );
 };
 
-// Protected Route Component
-const ProtectedRoute = ({ children, isAuthenticated }) => {
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
-
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = localStorage.getItem("adminToken");
-    return !!token;
-  });
-
-  return (
-    <FullScreenProvider>
-      <div>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              !isAuthenticated ? (
-                <Login setIsAuthenticated={setIsAuthenticated} />
-              ) : (
-                <Navigate to="/list" replace />
-              )
-            }
-          />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout setIsAuthenticated={setIsAuthenticated} />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </FullScreenProvider>
-  );
-};
+const App = () => (
+  <FullScreenProvider>
+    <AppLayout />
+  </FullScreenProvider>
+);
 
 export default App;
