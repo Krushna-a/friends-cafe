@@ -12,7 +12,26 @@ const { connectMongo } = require("./utils/mongo");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = [
+  "https://friends-cafe-seven.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (e.g. mobile apps, curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+      }
+    },
+    credentials: true,
+  }),
+);
+app.options("*", cors()); // handle preflight for all routes
 app.use(express.json());
 
 app.get("/", (req, res) => res.json({ message: "FCC Backend running" }));

@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
-const Otp = require("../models/Otp");
 
 function usingMongo() {
   return mongoose.connection.readyState === 1;
@@ -126,22 +125,11 @@ async function payOrder(userId, orderId) {
   }
 }
 
-async function saveOtpForMobile(mobile, hash, expiresAt, name = "") {
-  const up = await Otp.findOneAndUpdate(
-    { mobile },
-    { hash, expiresAt, name },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
-  );
-  return up.toObject();
+async function saveOtpForMobile() {}
+async function getOtpRecord() {
+  return null;
 }
-
-async function getOtpRecord(mobile) {
-  const r = await Otp.findOne({ mobile });
-  return r ? r.toObject() : null;
-}
-
-async function deleteOtpRecord(mobile) {
-  await Otp.deleteOne({ mobile });
+async function deleteOtpRecord() {
   return true;
 }
 

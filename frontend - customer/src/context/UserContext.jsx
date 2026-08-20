@@ -16,10 +16,9 @@ export function UserProvider({ children }) {
   })();
 
   const [user, setUser] = useState(initialUser);
-  // Do not show auth until the user explicitly tries to order/pay/see orders
   const [showAuth, setShowAuth] = useState(false);
 
-  // If a token exists we try to restore user from server
+  // Restore user from token on mount
   useEffect(() => {
     const token = localStorage.getItem("fcc_token");
     if (!token) return;
@@ -34,7 +33,6 @@ export function UserProvider({ children }) {
           setShowAuth(false);
           localStorage.setItem("fcc_user", JSON.stringify(j.user));
         } else {
-          // invalid token
           localStorage.removeItem("fcc_token");
         }
       } catch (e) {
@@ -43,45 +41,20 @@ export function UserProvider({ children }) {
     })();
   }, []);
 
-  // send otp via backend
-  const sendOtp = async ({ mobile, name }) => {
-    try {
-      const r = await fetch(`${API_BASE}/api/auth/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, name }),
-      });
-      const j = await r.json();
-      if (!r.ok) throw new Error(j.error || "Failed to send OTP");
-      // return otp only in non-production (server returns otp for dev)
-      return j.otp || null;
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
-
-  const verifyOtp = async ({ mobile, code }) => {
-    try {
-      const r = await fetch(`${API_BASE}/api/auth/verify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, code }),
-      });
-      const j = await r.json();
-      if (!r.ok) return false;
-      if (j.token && j.user) {
-        localStorage.setItem("fcc_token", j.token);
-        localStorage.setItem("fcc_user", JSON.stringify(j.user));
-        setUser(j.user);
-        setShowAuth(false);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
+  // Login: mobile + name, no OTP
+  const login = async ({ mobile, name }) => {
+    const r = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile, name }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "Login failed");
+    localStorage.setItem("fcc_token", j.token);
+    localStorage.setItem("fcc_user", JSON.stringify(j.user));
+    setUser(j.user);
+    setShowAuth(false);
+    return j.user;
   };
 
   const checkUser = async (mobile) => {
@@ -92,9 +65,8 @@ export function UserProvider({ children }) {
         body: JSON.stringify({ mobile }),
       });
       const j = await r.json();
-      if (r.ok && j.exists) {
+      if (r.ok && j.exists)
         return { exists: true, name: j.name || "", mobile: j.mobile };
-      }
       return { exists: false };
     } catch (e) {
       console.error("Failed to check user", e);
@@ -111,15 +83,7 @@ export function UserProvider({ children }) {
 
   return (
     <UserContext.Provider
-      value={{
-        user,
-        sendOtp,
-        verifyOtp,
-        checkUser,
-        showAuth,
-        setShowAuth,
-        logout,
-      }}
+      value={{ user, login, checkUser, showAuth, setShowAuth, logout }}
     >
       {children}
     </UserContext.Provider>
