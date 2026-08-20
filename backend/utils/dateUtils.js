@@ -12,7 +12,7 @@ function getCurrentIST() {
   // IST is UTC+5:30
   const istOffset = 5.5 * 60 * 60 * 1000;
   return new Date(
-    now.getTime() + (istOffset - now.getTimezoneOffset() * 60 * 1000)
+    now.getTime() + (istOffset - now.getTimezoneOffset() * 60 * 1000),
   );
 }
 
@@ -45,29 +45,6 @@ function formatDateForDisplay(dateInput) {
   } catch (error) {
     console.error("Date formatting error:", error);
     return dateInput?.toString() || "Invalid Date";
-  }
-}
-
-/**
- * Format date for display purposes
- * @param {string|Date} dateInput - Date string or Date object
- * @returns {string} Formatted date string for display
- */
-function formatDateForDisplay(dateInput) {
-  try {
-    const date = new Date(dateInput);
-    return date.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Kolkata",
-    });
-  } catch (error) {
-    console.error("Date formatting error:", error);
-    return "Invalid Date";
   }
 }
 

@@ -42,7 +42,6 @@ const AppLayout = () => {
       <Navbar />
 
       <Routes>
-        <Route path="/abc" element={<Menu />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/checkout" element={<Checkout />} />

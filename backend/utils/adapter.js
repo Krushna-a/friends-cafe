@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const { generateOrderNumber } = require("./helpers");
 
 function usingMongo() {
   return mongoose.connection.readyState === 1;
@@ -48,9 +49,7 @@ async function createOrder({ userId, items, paid, tableNumber }) {
   const total = subtotal;
   const finalAmount = total;
 
-  const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
-  const orderNumber = `${dateStr}${String(Date.now()).slice(-4)}`;
+  const orderNumber = generateOrderNumber();
 
   let customerName = "Customer";
   let customerMobile = "";
@@ -125,14 +124,6 @@ async function payOrder(userId, orderId) {
   }
 }
 
-async function saveOtpForMobile() {}
-async function getOtpRecord() {
-  return null;
-}
-async function deleteOtpRecord() {
-  return true;
-}
-
 module.exports = {
   usingMongo,
   findOrCreateUserByMobile,
@@ -142,7 +133,4 @@ module.exports = {
   createOrder,
   getOrdersByUser,
   payOrder,
-  saveOtpForMobile,
-  getOtpRecord,
-  deleteOtpRecord,
 };

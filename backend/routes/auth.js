@@ -1,19 +1,9 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const adapter = require("../utils/adapter");
+const { normalizePhone } = require("../utils/helpers");
 
 const router = express.Router();
-
-// Normalize to E.164 (India default)
-function normalizePhone(mobile) {
-  if (!mobile) throw new Error("Mobile required");
-  let phone = String(mobile)
-    .trim()
-    .replace(/[\s\-()]/g, "");
-  if (phone.startsWith("+")) return phone;
-  if (/^[6-9]\d{9}$/.test(phone)) return "+91" + phone;
-  throw new Error("Invalid mobile number");
-}
 
 // Login: provide mobile + name, get JWT back immediately
 router.post("/login", async (req, res) => {

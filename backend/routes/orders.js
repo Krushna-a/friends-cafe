@@ -82,8 +82,6 @@ router.patch("/:id/pay", authMiddleware, async (req, res) => {
       if (generated_signature !== razorpay_signature) {
         return res.status(400).json({ error: "Invalid payment signature" });
       }
-    } else {
-      // mock payment — no signature verification needed
     }
 
     const adapter = require("../utils/adapter");

@@ -62,12 +62,6 @@ const ProductSchema = new mongoose.Schema({
     fat: Number,
   },
 
-  // Legacy fields for backward compatibility
-  title: { type: String },
-  type: { type: String },
-  size: [{ type: String }],
-  color: [{ type: String }],
-
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

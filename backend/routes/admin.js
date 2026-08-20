@@ -4,7 +4,7 @@ const cloudinary = require("cloudinary").v2;
 const { Readable } = require("stream");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
-const adapter = require("../utils/adapter");
+const { generateOrderNumber, handleError } = require("../utils/helpers");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const Table = require("../models/Table");
@@ -61,8 +61,7 @@ router.get("/public/settings", async (req, res) => {
     };
     return res.json({ ok: true, settings: publicSettings });
   } catch (error) {
-    console.error("Get public settings error:", error);
-    return res.status(500).json({ error: "Failed to fetch settings" });
+    return handleError(res, error, "Failed to fetch settings");
   }
 });
 
@@ -71,69 +70,64 @@ router.get("/public/settings", async (req, res) => {
 // Admin Product Routes
 
 // Create Product
-router.post(
-  "/products",
-  upload.single("image1"),
-  async (req, res) => {
-    try {
-      const {
-        title,
-        description,
-        price,
-        category,
-        type,
-        inStock,
-        size,
-        color,
-        tags,
-      } = req.body;
+router.post("/products", upload.single("image1"), async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      price,
+      category,
+      type,
+      inStock,
+      size,
+      color,
+      tags,
+    } = req.body;
 
-      if (!title || !price || !category) {
-        return res
-          .status(400)
-          .json({ error: "Title, price, and category are required" });
-      }
-
-      let imageUrl = "";
-      if (req.file) {
-        try {
-          const result = await uploadToCloudinary(req.file.buffer);
-          imageUrl = result.secure_url;
-        } catch (error) {
-          console.error("Cloudinary upload error:", error);
-          return res.status(500).json({ error: "Failed to upload image" });
-        }
-      }
-
-      const productData = {
-        name: title,
-        title,
-        price: parseFloat(price),
-        description: description || "",
-        category,
-        type: type || "",
-        size: size ? (typeof size === "string" ? JSON.parse(size) : size) : [],
-        color: color
-          ? typeof color === "string"
-            ? JSON.parse(color)
-            : color
-          : [],
-        tags: tags ? (typeof tags === "string" ? JSON.parse(tags) : tags) : [],
-        inStock:
-          inStock === "true" || inStock === true || inStock === undefined,
-        image: imageUrl,
-      };
-
-      let product;
-      product = (await Product.create(productData)).toObject();
-
-      return res.json({ ok: true, product });
-    } catch (error) {
-      console.error("Create product error:", error);
-      return res.status(500).json({ error: "Failed to create product" });
+    if (!title || !price || !category) {
+      return res
+        .status(400)
+        .json({ error: "Title, price, and category are required" });
     }
-  },
-);
+
+    let imageUrl = "";
+    if (req.file) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer);
+        imageUrl = result.secure_url;
+      } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        return res.status(500).json({ error: "Failed to upload image" });
+      }
+    }
+
+    const productData = {
+      name: title,
+      title,
+      price: parseFloat(price),
+      description: description || "",
+      category,
+      type: type || "",
+      size: size ? (typeof size === "string" ? JSON.parse(size) : size) : [],
+      color: color
+        ? typeof color === "string"
+          ? JSON.parse(color)
+          : color
+        : [],
+      tags: tags ? (typeof tags === "string" ? JSON.parse(tags) : tags) : [],
+      inStock: inStock === "true" || inStock === true || inStock === undefined,
+      image: imageUrl,
+    };
+
+    let product;
+    product = (await Product.create(productData)).toObject();
+
+    return res.json({ ok: true, product });
+  } catch (error) {
+    console.error("Create product error:", error);
+    return res.status(500).json({ error: "Failed to create product" });
+  }
+});
 
 // Get Single Product (admin)
 router.get("/products/:id", async (req, res) => {
@@ -145,85 +139,80 @@ router.get("/products/:id", async (req, res) => {
     if (!product) return res.status(404).json({ error: "Product not found" });
     return res.json({ ok: true, product: product.toObject() });
   } catch (error) {
-    console.error("Get product error:", error);
-    return res.status(500).json({ error: "Failed to fetch product" });
+    return handleError(res, error, "Failed to fetch product");
   }
 });
 
 // Update Product
-router.put(
-  "/products/:id",
-  upload.single("image1"),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const {
-        title,
-        description,
-        price,
-        category,
-        type,
-        inStock,
-        size,
-        color,
-        tags,
-      } = req.body;
+router.put("/products/:id", upload.single("image1"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      price,
+      category,
+      type,
+      inStock,
+      size,
+      color,
+      tags,
+    } = req.body;
 
-      let product;
-      if (!mongoose.Types.ObjectId.isValid(id))
-        return res.status(404).json({ error: "Product not found" });
-      product = await Product.findById(id);
-      if (!product) return res.status(404).json({ error: "Product not found" });
+    let product;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(404).json({ error: "Product not found" });
+    product = await Product.findById(id);
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
-      // Upload new image if provided
-      if (req.file) {
-        try {
-          const result = await uploadToCloudinary(req.file.buffer);
-          product.image = result.secure_url;
-        } catch (error) {
-          console.error("Cloudinary upload error:", error);
-          return res.status(500).json({ error: "Failed to upload image" });
-        }
+    // Upload new image if provided
+    if (req.file) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer);
+        product.image = result.secure_url;
+      } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        return res.status(500).json({ error: "Failed to upload image" });
       }
-
-      // Update fields
-      if (title) {
-        product.name = title;
-        product.title = title;
-      }
-      if (description !== undefined) product.description = description;
-      if (price !== undefined) product.price = parseFloat(price);
-      if (category !== undefined) product.category = category;
-      if (type !== undefined) product.type = type;
-      if (inStock !== undefined)
-        product.inStock = inStock === "true" || inStock === true;
-      if (size !== undefined)
-        product.size = size
-          ? typeof size === "string"
-            ? JSON.parse(size)
-            : size
-          : [];
-      if (color !== undefined)
-        product.color = color
-          ? typeof color === "string"
-            ? JSON.parse(color)
-            : color
-          : [];
-      if (tags !== undefined)
-        product.tags = tags
-          ? typeof tags === "string"
-            ? JSON.parse(tags)
-            : tags
-          : [];
-
-      await product.save();
-      return res.json({ ok: true, product: product.toObject() });
-    } catch (error) {
-      console.error("Update product error:", error);
-      return res.status(500).json({ error: "Failed to update product" });
     }
-  },
-);
+
+    // Update fields
+    if (title) {
+      product.name = title;
+      product.title = title;
+    }
+    if (description !== undefined) product.description = description;
+    if (price !== undefined) product.price = parseFloat(price);
+    if (category !== undefined) product.category = category;
+    if (type !== undefined) product.type = type;
+    if (inStock !== undefined)
+      product.inStock = inStock === "true" || inStock === true;
+    if (size !== undefined)
+      product.size = size
+        ? typeof size === "string"
+          ? JSON.parse(size)
+          : size
+        : [];
+    if (color !== undefined)
+      product.color = color
+        ? typeof color === "string"
+          ? JSON.parse(color)
+          : color
+        : [];
+    if (tags !== undefined)
+      product.tags = tags
+        ? typeof tags === "string"
+          ? JSON.parse(tags)
+          : tags
+        : [];
+
+    await product.save();
+    return res.json({ ok: true, product: product.toObject() });
+  } catch (error) {
+    console.error("Update product error:", error);
+    return res.status(500).json({ error: "Failed to update product" });
+  }
+});
 
 // Delete Product
 router.delete("/products/:id", async (req, res) => {
@@ -237,8 +226,7 @@ router.delete("/products/:id", async (req, res) => {
 
     return res.json({ ok: true, message: "Product deleted" });
   } catch (error) {
-    console.error("Delete product error:", error);
-    return res.status(500).json({ error: "Failed to delete product" });
+    return handleError(res, error, "Failed to delete product");
   }
 });
 
@@ -330,11 +318,9 @@ router.post("/pos/orders", async (req, res) => {
       };
     });
 
-    const orderNumber = `${new Date().toISOString().slice(0, 10).replace(/-/g, "")}${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
+    const orderNumber = generateOrderNumber();
 
     const orderData = {
-      // Generate orderNumber manually since pre-save hook might not work with create()
-      orderNumber: orderNumber,
       customOrderId: customOrderId || `ORD-${Date.now()}`,
       customerName: isPosOrder ? "" : customerName, // Blank for POS orders
       customerMobile: isPosOrder ? "" : customerMobile || "",
@@ -414,7 +400,7 @@ router.post("/orders", async (req, res) => {
     }
 
     // Generate order number
-    const orderNumber = `${new Date().toISOString().slice(0, 10).replace(/-/g, "")}${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
+    const orderNumber = generateOrderNumber();
 
     // Prepare order data
     const orderData = {
@@ -868,51 +854,43 @@ router.get("/settings", async (req, res) => {
 });
 
 // Update Settings
-router.put(
-  "/settings",
-  upload.single("logo"),
-  async (req, res) => {
-    try {
-      const updateData = { ...req.body };
+router.put("/settings", upload.single("logo"), async (req, res) => {
+  try {
+    const updateData = { ...req.body };
 
-      // Handle nested objects
-      if (updateData.address && typeof updateData.address === "string") {
-        updateData.address = JSON.parse(updateData.address);
-      }
-      if (
-        updateData.socialMedia &&
-        typeof updateData.socialMedia === "string"
-      ) {
-        updateData.socialMedia = JSON.parse(updateData.socialMedia);
-      }
-      if (
-        updateData.businessHours &&
-        typeof updateData.businessHours === "string"
-      ) {
-        updateData.businessHours = JSON.parse(updateData.businessHours);
-      }
-
-      // Handle logo upload
-      if (req.file) {
-        try {
-          const result = await uploadToCloudinary(req.file.buffer);
-          updateData.logo = result.secure_url;
-        } catch (error) {
-          console.error("Logo upload error:", error);
-          return res.status(500).json({ error: "Failed to upload logo" });
-        }
-      }
-
-      let settings = await Settings.getSettings();
-      Object.assign(settings, updateData);
-      await settings.save();
-      return res.json({ ok: true, settings: settings.toObject() });
-    } catch (error) {
-      console.error("Update settings error:", error);
-      return res.status(500).json({ error: "Failed to update settings" });
+    // Handle nested objects
+    if (updateData.address && typeof updateData.address === "string") {
+      updateData.address = JSON.parse(updateData.address);
     }
-  },
-);
+    if (updateData.socialMedia && typeof updateData.socialMedia === "string") {
+      updateData.socialMedia = JSON.parse(updateData.socialMedia);
+    }
+    if (
+      updateData.businessHours &&
+      typeof updateData.businessHours === "string"
+    ) {
+      updateData.businessHours = JSON.parse(updateData.businessHours);
+    }
+
+    // Handle logo upload
+    if (req.file) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer);
+        updateData.logo = result.secure_url;
+      } catch (error) {
+        console.error("Logo upload error:", error);
+        return res.status(500).json({ error: "Failed to upload logo" });
+      }
+    }
+
+    let settings = await Settings.getSettings();
+    Object.assign(settings, updateData);
+    await settings.save();
+    return res.json({ ok: true, settings: settings.toObject() });
+  } catch (error) {
+    console.error("Update settings error:", error);
+    return res.status(500).json({ error: "Failed to update settings" });
+  }
+});
 
 module.exports = router;
-
