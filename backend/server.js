@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 4000;
 
 const allowedOrigins = [
   "https://friends-cafe-seven.vercel.app",
+  "https://friends-cafe-v5m2.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ];
